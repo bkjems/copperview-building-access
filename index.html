@@ -166,8 +166,10 @@
       var form = ev.target;
       var today = new Date();
       today.setHours(0, 0, 0, 0);
-      var startDate = new Date(form.startDate.value);
-      var endDate = new Date(form.endDate.value);
+      var startParts = form.startDate.value.split('-');
+      var startDate = new Date(startParts[0], startParts[1] - 1, startParts[2]);
+      var endParts = form.endDate.value.split('-');
+      var endDate = new Date(endParts[0], endParts[1] - 1, endParts[2]);
 
       if (startDate < today) {
         document.getElementById('message').style.color = '#f44336';
