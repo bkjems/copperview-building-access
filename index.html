@@ -7,30 +7,18 @@
 </head>
 <body class="light">
   <div class="header">
-    <h2>Copperview Stake<br><span style="font-size:0.7em; white-space:nowrap">Temporary Building Access</span></h2>
+    <h2><span id="stakeName"></span><br><span style="font-size:0.7em; white-space:nowrap">Temporary Building Access</span></h2>
     <button type="button" id="modeToggle" onclick="toggleMode()">&#9789;</button>
   </div>
   <form id="licenseForm">
     <label>Ward</label>
     <select name="ward" required onchange="autoSelectBuilding(this.value)">
       <option value="">-- Select Ward --</option>
-      <option>1st Ward</option>
-      <option>2nd Ward</option>
-      <option>3rd Ward</option>
-      <option>4th Ward</option>
-      <option>5th Ward</option>
-      <option>6th Ward</option>
-      <option>7th Ward</option>
-      <option>8th Ward</option>
-      <option>9th Ward</option>
     </select>
 
     <label>Building</label>
     <select name="building" required>
       <option value="">-- Select Building --</option>
-      <option>3200 Building</option>
-      <option>2700 Building</option>
-      <option>Stake Center</option>
     </select>
 
     <label>Name</label>
@@ -64,6 +52,7 @@
     </div>
   </form>
 
+  <script src="config.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

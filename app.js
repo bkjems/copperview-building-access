@@ -1,16 +1,39 @@
 var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzFkhiIYgxUqWKyyAwSKcW864MLgczgh_DhDYTtDQKU91tFxVwWSBmPLUDz-B2kWD2O/exec';
 
+// Build ward-to-building map from config
+var wardBuildingMap = {};
+CONFIG.buildings.forEach(function(b) {
+  b.wards.forEach(function(w) {
+    wardBuildingMap[w] = b.name;
+  });
+});
+
+// Populate title
+document.getElementById('stakeName').textContent = CONFIG.stakeName;
+
+// Populate ward dropdown
+var wardSelect = document.querySelector('select[name="ward"]');
+CONFIG.buildings.forEach(function(b) {
+  b.wards.forEach(function(w) {
+    var opt = document.createElement('option');
+    opt.value = w;
+    opt.textContent = w;
+    wardSelect.appendChild(opt);
+  });
+});
+
+// Populate building dropdown
+var buildingSelect = document.querySelector('select[name="building"]');
+CONFIG.buildings.forEach(function(b) {
+  var opt = document.createElement('option');
+  opt.value = b.name;
+  opt.textContent = b.name;
+  buildingSelect.appendChild(opt);
+});
+
 function autoSelectBuilding(ward) {
   var building = document.querySelector('select[name="building"]');
-  var map = {
-    "1st Ward": "2700 Building",
-    "2nd Ward": "2700 Building",
-    "3rd Ward": "2700 Building",
-    "4th Ward": "3200 Building",
-    "6th Ward": "3200 Building",
-    "7th Ward": "3200 Building"
-  };
-  building.value = map[ward] || "Stake Center";
+  building.value = wardBuildingMap[ward] || "";
 }
 
 function toggleMode() {
