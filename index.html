@@ -31,16 +31,20 @@
     <input type="text" name="purpose" placeholder="Optional">
 
     <label>Start Date</label>
-    <input type="date" name="startDate" required onchange="if(!this.form.startTime.value) this.form.startTime.value='10:00'">
+    <input type="date" name="startDate" required onchange="if(!this.form.startTime.value) this.form.startTime.value='10:00 AM'">
 
     <label>Start Time</label>
-    <input type="time" name="startTime" required>
+    <select name="startTime" required>
+      <option value="">-- Select Time --</option>
+    </select>
 
     <label>End Date</label>
-    <input type="date" name="endDate" required onchange="if(!this.form.endTime.value) this.form.endTime.value='22:00'">
+    <input type="date" name="endDate" required onchange="if(!this.form.endTime.value) this.form.endTime.value='10:00 PM'">
 
     <label>End Time</label>
-    <input type="time" name="endTime" required>
+    <select name="endTime" required>
+      <option value="">-- Select Time --</option>
+    </select>
 
     <label>Notes</label>
     <textarea name="notes" rows="3" placeholder="Optional"></textarea>
