@@ -3,17 +3,14 @@ var CONFIG = {
   buildings: [
     {
       name: "2700 Building",
-      email: "bkweston@gmail.com",
       wards: ["1st Ward", "2nd Ward", "3rd Ward"]
     },
     {
       name: "3200 Building",
-      email: "bkweston@gmail.com",
       wards: ["4th Ward", "6th Ward", "7th Ward"]
     },
     {
       name: "Stake Center",
-      email: "bkweston@gmail.com",
       wards: ["5th Ward", "8th Ward", "9th Ward"]
     }
   ]

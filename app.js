@@ -1,10 +1,8 @@
 var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzFkhiIYgxUqWKyyAwSKcW864MLgczgh_DhDYTtDQKU91tFxVwWSBmPLUDz-B2kWD2O/exec';
 
-// Build ward-to-building and building-to-email maps from config
+// Build ward-to-building map from config
 var wardBuildingMap = {};
-var buildingEmailMap = {};
 CONFIG.buildings.forEach(function(b) {
-  buildingEmailMap[b.name] = b.email;
   b.wards.forEach(function(w) {
     wardBuildingMap[w] = b.name;
   });
@@ -79,7 +77,6 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
   var data = {
     ward: form.ward.value,
     building: form.building.value,
-    recipient: buildingEmailMap[form.building.value] || "",
     name: form.name.value,
     email: form.email.value,
     purpose: form.purpose.value,
