@@ -33,7 +33,7 @@ function populateTimeDropdown(selectName) {
       var label = h12 + ':' + String(m).padStart(2, '0') + ' ' + ampm;
       var opt = document.createElement('option');
       opt.value = label;
-      opt.textContent = label;
+      opt.textContent = (h === 12 && m === 0) ? '12:00 PM (Noon)' : label;
       select.appendChild(opt);
     }
   }
