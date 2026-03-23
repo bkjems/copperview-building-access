@@ -164,6 +164,12 @@
     document.getElementById('licenseForm').addEventListener('submit', function(ev) {
       ev.preventDefault();
       var form = ev.target;
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
       var today = new Date();
       today.setHours(0, 0, 0, 0);
       var startParts = form.startDate.value.split('-');
