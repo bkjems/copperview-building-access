@@ -10,6 +10,7 @@ CONFIG.buildings.forEach(function(b) {
 
 // Populate title
 document.getElementById('stakeName').textContent = CONFIG.stakeName;
+document.title = CONFIG.stakeName + ' — Temporary Building Access';
 
 // Populate ward dropdown
 var wardSelect = document.querySelector('select[name="ward"]');
