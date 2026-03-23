@@ -2,10 +2,6 @@
 
 A web form for requesting temporary building access for church stake buildings. Hosted on GitHub Pages with a Google Apps Script backend for email notifications and spreadsheet tracking.
 
-## Live Site
-
-https://bkjems.github.io/copperview-building-access/
-
 ## How It Works
 
 1. User fills out the form (ward, building, name, email, dates/times)
