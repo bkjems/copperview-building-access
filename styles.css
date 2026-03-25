@@ -46,6 +46,14 @@ input[type="time"]::-webkit-date-and-time-value {
 }
 select { padding: 16px 10px; }
 input::placeholder, textarea::placeholder { color: #888; font-size: 1rem; }
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--input-bg) inset;
+  -webkit-text-fill-color: var(--text);
+  border: 1px solid var(--input-border);
+  transition: background-color 5000s ease-in-out 0s;
+}
 .btn-row { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
 .submit-btn {
   padding: 18px 20px;
