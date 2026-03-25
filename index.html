@@ -22,10 +22,10 @@
     </select>
 
     <label>Name</label>
-    <input type="text" name="name" required>
+    <input type="text" name="name" required maxlength="100">
 
     <label>Email</label>
-    <input type="email" name="email" required>
+    <input type="email" name="email" required maxlength="254">
 
     <label>Start Date</label>
     <input type="date" name="startDate" required onchange="if(!this.form.startTime.value) this.form.startTime.value='10:00 AM'">
@@ -44,7 +44,7 @@
     </select>
 
     <label>Purpose</label>
-    <textarea name="purpose" rows="3" placeholder="Optional"></textarea>
+    <textarea name="purpose" rows="3" placeholder="Optional" maxlength="500"></textarea>
 
     <div id="message"></div>
     <div class="btn-row">
