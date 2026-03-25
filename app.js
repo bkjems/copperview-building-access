@@ -116,9 +116,11 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
     body: 'data=' + encodeURIComponent(JSON.stringify(data))
   })
   .then(function() {
-    document.getElementById('message').style.color = '#4caf50';
-    document.getElementById('message').textContent = 'Request submitted successfully!';
+    var msg = document.getElementById('message');
+    msg.style.color = '#4caf50';
+    msg.textContent = 'Request submitted successfully!';
     form.reset();
+    setTimeout(function() { msg.textContent = ''; }, 7000);
   })
   .catch(function(err) {
     document.getElementById('message').style.color = '#f44336';
