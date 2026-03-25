@@ -55,6 +55,33 @@ function autoSelectBuilding(ward) {
   building.value = wardBuildingMap[ward] || "";
 }
 
+// Set min date on date fields to today
+function setMinDates() {
+  var today = new Date().toISOString().split('T')[0];
+  document.querySelector('input[name="startDate"]').min = today;
+  document.querySelector('input[name="endDate"]').min = today;
+}
+setMinDates();
+
+function onStartDateChange(form) {
+  if (!form.startTime.value) form.startTime.value = '10:00 AM';
+  if (!form.endDate.value) form.endDate.value = form.startDate.value;
+  form.endDate.min = form.startDate.value;
+}
+
+function onEndDateChange(form) {
+  if (!form.endTime.value) form.endTime.value = '10:00 PM';
+}
+
+function confirmCancel() {
+  var form = document.getElementById('licenseForm');
+  var hasInput = form.name.value || form.email.value || form.purpose.value || form.startDate.value || form.endDate.value;
+  if (!hasInput || confirm('Are you sure you want to clear the form?')) {
+    form.reset();
+    document.getElementById('message').textContent = '';
+  }
+}
+
 function toggleMode() {
   document.body.classList.toggle('light');
   var btn = document.getElementById('modeToggle');
@@ -65,9 +92,21 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
   ev.preventDefault();
   var form = ev.target;
 
+  // Trim whitespace
+  form.name.value = form.name.value.trim();
+  form.email.value = form.email.value.trim();
+  form.purpose.value = form.purpose.value.trim();
+
   if (!form.checkValidity()) {
     form.reportValidity();
     return;
+  }
+
+  var msg = document.getElementById('message');
+  function showError(text) {
+    msg.style.color = '#f44336';
+    msg.textContent = text;
+    msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   var today = new Date();
@@ -78,19 +117,30 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
   var endDate = new Date(endParts[0], endParts[1] - 1, endParts[2]);
 
   if (startDate < today) {
-    document.getElementById('message').style.color = '#f44336';
-    document.getElementById('message').textContent = 'Start date cannot be in the past.';
+    showError('Start date cannot be in the past.');
     return;
   }
   if (endDate < today) {
-    document.getElementById('message').style.color = '#f44336';
-    document.getElementById('message').textContent = 'End date cannot be in the past.';
+    showError('End date cannot be in the past.');
     return;
   }
   if (endDate < startDate) {
-    document.getElementById('message').style.color = '#f44336';
-    document.getElementById('message').textContent = 'End date cannot be before start date.';
+    showError('End date cannot be before start date.');
     return;
+  }
+  if (startDate.getTime() === endDate.getTime() && form.startTime.value && form.endTime.value) {
+    var toMinutes = function(t) {
+      var parts = t.match(/(\d+):(\d+)\s*(AM|PM)/i);
+      var h = parseInt(parts[1]);
+      var m = parseInt(parts[2]);
+      if (parts[3].toUpperCase() === 'PM' && h !== 12) h += 12;
+      if (parts[3].toUpperCase() === 'AM' && h === 12) h = 0;
+      return h * 60 + m;
+    };
+    if (toMinutes(form.endTime.value) <= toMinutes(form.startTime.value)) {
+      showError('End time must be after start time on the same day.');
+      return;
+    }
   }
 
   var data = {
@@ -118,17 +168,18 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
     body: 'data=' + encodeURIComponent(JSON.stringify(data))
   })
   .then(function() {
-    var msg = document.getElementById('message');
     msg.style.color = '#4caf50';
     msg.textContent = 'Request submitted successfully!';
+    msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
     form.reset();
     submitBtn.disabled = false;
     submitBtn.textContent = 'Submit Request';
     setTimeout(function() { msg.textContent = ''; }, 7000);
   })
   .catch(function(err) {
-    document.getElementById('message').style.color = '#f44336';
-    document.getElementById('message').textContent = 'Error: ' + err.message;
+    msg.style.color = '#f44336';
+    msg.textContent = 'Error: ' + err.message;
+    msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
     submitBtn.disabled = false;
     submitBtn.textContent = 'Submit Request';
   });

@@ -28,7 +28,7 @@
     <input type="email" name="email" required maxlength="254">
 
     <label>Start Date</label>
-    <input type="date" name="startDate" required onchange="if(!this.form.startTime.value) this.form.startTime.value='10:00 AM'">
+    <input type="date" name="startDate" required onchange="onStartDateChange(this.form)">
 
     <label>Start Time</label>
     <select name="startTime" required>
@@ -36,7 +36,7 @@
     </select>
 
     <label>End Date</label>
-    <input type="date" name="endDate" required onchange="if(!this.form.endTime.value) this.form.endTime.value='10:00 PM'">
+    <input type="date" name="endDate" required onchange="onEndDateChange(this.form)">
 
     <label>End Time</label>
     <select name="endTime" required>
@@ -49,7 +49,7 @@
     <div id="message"></div>
     <div class="btn-row">
       <button type="submit" class="submit-btn">Submit Request</button>
-      <button type="button" class="cancel-btn" onclick="document.getElementById('licenseForm').reset(); document.getElementById('message').textContent='';">Cancel</button>
+      <button type="button" class="cancel-btn" onclick="confirmCancel()">Cancel</button>
     </div>
   </form>
 
