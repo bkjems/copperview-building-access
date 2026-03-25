@@ -105,6 +105,10 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
     endTime: form.endTime.value
   };
 
+  var submitBtn = form.querySelector('.submit-btn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Submitting...';
+
   document.getElementById('message').textContent = 'Submitting...';
   document.getElementById('message').style.color = '#4caf50';
 
@@ -119,10 +123,14 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
     msg.style.color = '#4caf50';
     msg.textContent = 'Request submitted successfully!';
     form.reset();
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit Request';
     setTimeout(function() { msg.textContent = ''; }, 7000);
   })
   .catch(function(err) {
     document.getElementById('message').style.color = '#f44336';
     document.getElementById('message').textContent = 'Error: ' + err.message;
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit Request';
   });
 });
