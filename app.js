@@ -64,8 +64,11 @@ function setMinDates() {
 setMinDates();
 
 function onStartDateChange(form) {
-  if (!form.startTime.value) form.startTime.value = '10:00 AM';
-  if (!form.endDate.value) form.endDate.value = form.startDate.value;
+  if (!form.startTime.value) form.startTime.value = '8:00 AM';
+  if (!form.endDate.value) {
+    form.endDate.value = form.startDate.value;
+    if (!form.endTime.value) form.endTime.value = '10:00 PM';
+  }
   form.endDate.min = form.startDate.value;
 }
 
