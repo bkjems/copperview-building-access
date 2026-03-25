@@ -102,8 +102,7 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
     startDate: form.startDate.value,
     startTime: form.startTime.value,
     endDate: form.endDate.value,
-    endTime: form.endTime.value,
-    notes: form.notes.value
+    endTime: form.endTime.value
   };
 
   document.getElementById('message').textContent = 'Submitting...';

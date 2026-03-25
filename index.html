@@ -27,9 +27,6 @@
     <label>Email</label>
     <input type="email" name="email" required>
 
-    <label>Purpose</label>
-    <input type="text" name="purpose" placeholder="Optional">
-
     <label>Start Date</label>
     <input type="date" name="startDate" required onchange="if(!this.form.startTime.value) this.form.startTime.value='10:00 AM'">
 
@@ -46,8 +43,8 @@
       <option value="">-- Select Time --</option>
     </select>
 
-    <label>Notes</label>
-    <textarea name="notes" rows="3" placeholder="Optional"></textarea>
+    <label>Purpose</label>
+    <textarea name="purpose" rows="3" placeholder="Optional"></textarea>
 
     <div id="message"></div>
     <div class="btn-row">
