@@ -63,18 +63,27 @@ function setMinDates() {
 }
 setMinDates();
 
-function onStartDateChange(form) {
+var lastStartDate = '';
+var lastEndDate = '';
+
+document.querySelector('input[name="startDate"]').addEventListener('blur', function() {
+  var form = this.form;
+  if (!form.startDate.value || form.startDate.value === lastStartDate) return;
+  lastStartDate = form.startDate.value;
   if (!form.startTime.value) form.startTime.value = '8:00 AM';
   form.endDate.min = form.startDate.value;
   if (!form.endDate.value || form.endDate.value < form.startDate.value) {
     form.endDate.value = form.startDate.value;
   }
   if (!form.endTime.value) form.endTime.value = '10:00 PM';
-}
+});
 
-function onEndDateChange(form) {
+document.querySelector('input[name="endDate"]').addEventListener('blur', function() {
+  var form = this.form;
+  if (!form.endDate.value || form.endDate.value === lastEndDate) return;
+  lastEndDate = form.endDate.value;
   if (!form.endTime.value) form.endTime.value = '10:00 PM';
-}
+});
 
 function confirmCancel() {
   var form = document.getElementById('licenseForm');
