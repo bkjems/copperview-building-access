@@ -109,8 +109,7 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
   submitBtn.disabled = true;
   submitBtn.textContent = 'Submitting...';
 
-  document.getElementById('message').textContent = 'Submitting...';
-  document.getElementById('message').style.color = '#4caf50';
+  document.getElementById('message').textContent = '';
 
   fetch(APPS_SCRIPT_URL, {
     method: 'POST',
