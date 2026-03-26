@@ -12,15 +12,20 @@ CONFIG.buildings.forEach(function(b) {
 document.getElementById('stakeName').textContent = CONFIG.stakeName;
 document.title = CONFIG.stakeName + ' — Temporary Building Access';
 
-// Populate ward dropdown
+// Populate ward dropdown (sorted)
 var wardSelect = document.querySelector('select[name="ward"]');
+var allWards = [];
 CONFIG.buildings.forEach(function(b) {
-  b.wards.forEach(function(w) {
-    var opt = document.createElement('option');
-    opt.value = w;
-    opt.textContent = w;
-    wardSelect.appendChild(opt);
-  });
+  b.wards.forEach(function(w) { allWards.push(w); });
+});
+allWards.sort(function(a, b) {
+  return parseInt(a) - parseInt(b);
+});
+allWards.forEach(function(w) {
+  var opt = document.createElement('option');
+  opt.value = w;
+  opt.textContent = w;
+  wardSelect.appendChild(opt);
 });
 
 // Populate time dropdowns
