@@ -201,3 +201,22 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
     submitBtn.textContent = 'Submit Request';
   });
 });
+
+// Auto-fill form for testing when ?test=true is in the URL
+var testParam = new URLSearchParams(window.location.search).get('test');
+if (testParam === 'true' || testParam === '1') {
+  var form = document.getElementById('licenseForm');
+  var tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  var dateStr = tomorrow.toISOString().split('T')[0];
+
+  form.ward.value = '8th Ward';
+  autoSelectBuilding('8th Ward');
+  form.name.value = 'John Test';
+  form.email.value = 'test@gmail.com';
+  form.startDate.value = dateStr;
+  form.startTime.value = '8:00 AM';
+  form.endDate.value = dateStr;
+  form.endTime.value = '10:00 PM';
+  form.purpose.value = 'Testing form submission';
+}
