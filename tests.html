@@ -30,7 +30,7 @@
       <select name="startTime" required><option value="">-- Select Time --</option></select>
       <input type="date" name="endDate" required>
       <select name="endTime" required><option value="">-- Select Time --</option></select>
-      <textarea name="purpose" rows="3" placeholder="Optional" maxlength="500"></textarea>
+      <input type="text" name="purpose" maxlength="150">
       <div id="message"></div>
       <button type="submit" class="submit-btn">Submit Request</button>
     </form>
@@ -135,7 +135,7 @@
 
     log('Name maxlength is 100', document.querySelector('input[name="name"]').maxLength === 100);
     log('Email maxlength is 254', document.querySelector('input[name="email"]').maxLength === 254);
-    log('Purpose maxlength is 500', document.querySelector('textarea[name="purpose"]').maxLength === 500);
+    log('Purpose maxlength is 150', document.querySelector('input[name="purpose"]').maxLength === 150);
 
     // ── Time Parsing (toMinutes) ──
     section('Time Parsing');
