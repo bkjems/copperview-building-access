@@ -156,7 +156,7 @@ function parseCSV(filePath) {
     };
     const toggleLabel = buildingMap[user.building];
     if (toggleLabel) {
-      await page.getByText(toggleLabel).click();
+      await page.getByText(toggleLabel).first().click();
       await page.waitForTimeout(1000);
     }
 
