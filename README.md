@@ -1,6 +1,6 @@
 # Temporary Building Access Form
 
-A web form for requesting temporary building access for church stake buildings. Hosted on GitHub Pages with a Google Apps Script backend for email notifications and spreadsheet tracking.
+A web form for requesting temporary building access for church stake buildings. Hosted on GitHub Pages with a Google Apps Script backend for email notifications and spreadsheet tracking. Includes a Playwright-based automation script for bulk-importing users into the Kindoo access control system.
 
 ## How It Works
 
@@ -15,7 +15,10 @@ A web form for requesting temporary building access for church stake buildings. 
 - `styles.css` — Styling (dark/light mode support)
 - `app.js` — Form logic, validation, and submission
 - `config.js` — Stake name, buildings, and ward assignments
+- `code.gs` — Google Apps Script backend (email + spreadsheet)
 - `tests.html` — Unit tests (open in browser to run)
+- `kindoo.js` — Playwright automation for bulk Kindoo user imports
+- `users.csv` — CSV input for Kindoo bulk import
 
 ## Configuration
 
@@ -41,10 +44,45 @@ var CONFIG = {
 
 1. Open your Google Spreadsheet
 2. Go to **Extensions > Apps Script**
-3. Add the `doGet`, `doPost`, and `submitForm` functions
+3. Add the `doGet`, `doPost`, and `submitForm` functions from `code.gs`
 4. Configure the `emailMap` in Apps Script with building manager email addresses (kept private, not in this repo)
 5. Deploy as a **Web app** (Execute as: Me, Access: Anyone)
 6. Update `APPS_SCRIPT_URL` in `app.js` with your deployment URL
+
+## Kindoo Bulk Import
+
+The `kindoo.js` script uses Playwright to automate adding temporary users to the Kindoo building access system.
+
+### Setup
+
+```bash
+npm install
+```
+
+Create a `.env` file with your Kindoo/LDS credentials:
+
+```
+KINDOO_EMAIL=your-email@example.com
+KINDOO_USERNAME=your-lds-username
+KINDOO_PASSWORD=your-lds-password
+```
+
+### CSV Format
+
+Prepare a `users.csv` file:
+
+```csv
+email,description,startDate,startTime,endDate,endTime,building
+user@gmail.com,Ward Activity,04/01/2026,06:00 PM,04/01/2026,09:00 PM,Stake Center
+```
+
+### Run
+
+```bash
+node kindoo.js
+```
+
+For each row in the CSV, the script logs into Kindoo, adds the user with the specified date/time constraints and building access, and sends them an invitation email.
 
 ## Features
 
@@ -65,6 +103,7 @@ var CONFIG = {
 - Mobile responsive
 - Email notifications to building managers
 - Entries logged to Google Spreadsheet
+- Test mode via `?test=true` URL parameter for quick form testing
 
 ## Running Tests
 
