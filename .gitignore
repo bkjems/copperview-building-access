@@ -1,3 +1,6 @@
 .DS_Store
 test_import.csv
 code.gs
+.env
+node_modules
+users.csv
