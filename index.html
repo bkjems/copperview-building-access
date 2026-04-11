@@ -1,52 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Copperview Stake - Temporary Building Access</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="light">
   <div class="header">
-    <h2><span id="stakeName"></span><br><span style="font-size:0.7em; white-space:nowrap">Temporary Building Access</span></h2>
-    <button type="button" id="modeToggle" onclick="toggleMode()">&#9789;</button>
+    <h2><span id="stakeName"></span><br><span class="header-subtitle">Temporary Building Access</span></h2>
+    <button type="button" id="modeToggle" onclick="toggleMode()" aria-label="Toggle light and dark mode">&#9789;</button>
   </div>
   <form id="licenseForm">
-    <label>Ward</label>
-    <select name="ward" required onchange="autoSelectBuilding(this.value)">
+    <label for="ward">Ward</label>
+    <select id="ward" name="ward" required onchange="autoSelectBuilding(this.value)">
       <option value="">-- Select Ward --</option>
     </select>
 
-    <label>Building</label>
-    <select name="building" required>
+    <label for="building">Building</label>
+    <select id="building" name="building" required>
       <option value="">-- Select Building --</option>
     </select>
 
-    <label>Name</label>
-    <input type="text" name="name" required maxlength="100">
+    <label for="name">Name</label>
+    <input id="name" type="text" name="name" required maxlength="100" autocomplete="name">
 
-    <label>Email</label>
-    <input type="email" name="email" required maxlength="254" placeholder="Enter your church email">
+    <label for="email">Email</label>
+    <input id="email" type="email" name="email" required maxlength="254" placeholder="Enter your church email" autocomplete="email">
 
-    <label>Start Date</label>
-    <input type="date" name="startDate" required>
+    <label for="startDate">Start Date</label>
+    <input id="startDate" type="date" name="startDate" required>
 
-    <label>Start Time</label>
-    <select name="startTime" required>
+    <label for="startTime">Start Time</label>
+    <select id="startTime" name="startTime" required>
       <option value="">-- Select Time --</option>
     </select>
 
-    <label>End Date</label>
-    <input type="date" name="endDate" required>
+    <label for="endDate">End Date</label>
+    <input id="endDate" type="date" name="endDate" required>
 
-    <label>End Time</label>
-    <select name="endTime" required>
+    <label for="endTime">End Time</label>
+    <select id="endTime" name="endTime" required>
       <option value="">-- Select Time --</option>
     </select>
 
-    <label>Purpose</label>
-    <input type="text" name="purpose" maxlength="150">
+    <label for="purpose">Purpose</label>
+    <input id="purpose" type="text" name="purpose" maxlength="150">
 
-    <div id="message"></div>
+    <div id="message" role="status" aria-live="polite" aria-atomic="true"></div>
     <div class="btn-row">
       <button type="submit" class="submit-btn">Submit Request</button>
       <button type="button" class="cancel-btn" onclick="confirmCancel()">Cancel</button>
