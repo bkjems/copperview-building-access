@@ -36,6 +36,9 @@ input, select, textarea {
   font-size: 1rem;
   -webkit-appearance: none;
 }
+textarea {
+  resize: vertical;
+}
 input[type="date"], input[type="time"] {
   text-align: left;
   min-height: 54px;
@@ -47,6 +50,7 @@ input[type="time"]::-webkit-date-and-time-value {
 }
 select { padding: 16px 10px; }
 input::placeholder, textarea::placeholder { color: #888; font-size: 1rem; }
+#bulkChanges, #bulkChanges::placeholder { font-size: 0.7rem; }
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
