@@ -1,12 +1,16 @@
 # Copperview Temporary Building Access Form
+<!-- cSpell:ignore Copperview -->
 
-A web form for requesting temporary building access for church stake buildings. Hosted on GitHub Pages with a Google Apps Script backend for email notifications and spreadsheet tracking. 
+A web form for requesting temporary building access for church stake buildings. Hosted on GitHub Pages with a Google Apps Script backend for email notifications.
 
 ## How It Works
 
-1. User fills out the form (ward, building, name, email, dates/times, purpose)
-2. Form submits data to a Google Apps Script backend
-3. Apps Script writes the entry to the appropriate ward tab in a Google Spreadsheet
+1. User selects a ward, building, and request type
+2. Based on the request type, the appropriate fields are shown:
+   - **Building Access** — name, email, dates/times, purpose
+   - **Schedule Building Lockup** — bulk information textarea (name, email, date range)
+   - **Update (s)** — bulk information textarea (name, email, calling)
+3. Form submits data to a Google Apps Script backend
 4. Apps Script sends an email notification to the building manager
 
 ## Project Structure
@@ -15,6 +19,7 @@ A web form for requesting temporary building access for church stake buildings. 
 - `styles.css` — Styling (dark/light mode support)
 - `app.js` — Form logic, validation, and submission
 - `config.js` — Stake name, buildings, and ward assignments
+- `apps_script/code.gs` — Google Apps Script backend (form handler, email notifications)
 - `tests.html` — Unit tests (open in browser to run)
 
 ## Configuration
@@ -64,6 +69,7 @@ KINDOO_PASSWORD=your-lds-password
 
 ## Features
 
+- **Request type dropdown** — dynamically shows/hides fields based on selection
 - Dark/light mode toggle
 - Auto-selects building based on ward
 - Date validation (no past dates, end date must be after start date)
@@ -75,13 +81,15 @@ KINDOO_PASSWORD=your-lds-password
 - Whitespace trimming on text inputs
 - Submit button disabled during submission to prevent duplicates
 - Success message auto-clears after 7 seconds
-- Cancel confirmation when form has data
+- Cancel confirmation when form has data — resets to initial view
 - Scroll to error/success messages on mobile
 - Browser autofill styled to match dark/light theme
 - Mobile responsive
-- Email notifications to building managers
-- Entries logged to Google Spreadsheet
-- Test mode via `?test=true` URL parameter for quick form testing
+- Email notifications to building managers with dynamic subject/heading based on request type
+- Test mode via `?test=<number>` URL parameter for quick form testing:
+  - `?test=1` — Building Access with sample date/time data
+  - `?test=2` — Schedule Building Lockup with sample lockup entries
+  - `?test=3` — Update Custom Calling(s) with sample calling entries
 
 ## Running Tests
 
