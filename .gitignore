@@ -9,3 +9,13 @@ custcallings
 kindoo.js
 login_tracker/logged_in_users.csv
 sheetUtils.gs
+custom_users.csv
+login_tracker/track_logins.py
+login_tracker/login_report.txt
+login_tracker/activated_users.csv
+.vscode/settings.json
+login_tracker/_DontUse_track_logins.py
+login_tracker/login_report.py
+login_tracker/README.md
+test-results/.last-run.json
+email.md
