@@ -22,37 +22,61 @@
       <option value="">-- Select Building --</option>
     </select>
 
-    <label for="name">Name</label>
-    <input id="name" type="text" name="name" required maxlength="100" autocomplete="name">
-
-    <label for="email">Email</label>
-    <input id="email" type="email" name="email" required maxlength="254" placeholder="Enter your church email" autocomplete="email">
-
-    <label for="startDate">Start Date</label>
-    <input id="startDate" type="date" name="startDate" required>
-
-    <label for="startTime">Start Time</label>
-    <select id="startTime" name="startTime" required>
-      <option value="">-- Select Time --</option>
+    <label for="request">Request</label>
+    <select id="request" name="request" required>
+      <option value="">-- Select Request --</option>
+      <option value="building_access">Building Access</option>
+      <option value="building_lockup">Schedule Building Lockup</option>
+      <option value="custom_callings">Update Custom Calling(s)</option>
     </select>
 
-    <label for="endDate">End Date</label>
-    <input id="endDate" type="date" name="endDate" required>
+    <p id="usageNote" class="access-note">Select a Ward, Building and choose your Request.</p>
 
-    <label for="endTime">End Time</label>
-    <select id="endTime" name="endTime" required>
-      <option value="">-- Select Time --</option>
-    </select>
+    <div id="requestContent" class="hidden">
 
-    <label for="purpose">Purpose</label>
-    <input id="purpose" type="text" name="purpose" maxlength="150">
+    <div id="nameEmailFields">
+      <label for="name">Name</label>
+      <input id="name" type="text" name="name" maxlength="100" autocomplete="name">
 
-    <p class="access-note">You'll receive access within 24 hours.</p>
-    <div id="message" role="status" aria-live="polite" aria-atomic="true"></div>
+      <label for="email">Email</label>
+      <input id="email" type="email" name="email" maxlength="254" placeholder="Enter your church email" autocomplete="email">
+    </div>
+
+    <div id="temporaryFields">
+      <label for="startDate">Start Date</label>
+      <input id="startDate" type="date" name="startDate">
+
+      <label for="startTime">Start Time</label>
+      <select id="startTime" name="startTime">
+        <option value="">-- Select Time --</option>
+      </select>
+
+      <label for="endDate">End Date</label>
+      <input id="endDate" type="date" name="endDate">
+
+      <label for="endTime">End Time</label>
+      <select id="endTime" name="endTime">
+        <option value="">-- Select Time --</option>
+      </select>
+
+      <label for="purpose">Purpose</label>
+      <input id="purpose" type="text" name="purpose" maxlength="150">
+    </div>
+
+    <div id="lockupFields" class="hidden">
+      <label for="bulkChanges">Information</label>
+      <p id="bulkHint" class="field-hint"></p>
+      <textarea id="bulkChanges" name="bulkChanges" rows="5"></textarea>
+    </div>
+
+    <p class="access-note">Access granted within 24 hours.</p>
     <div class="btn-row">
       <button type="submit" class="submit-btn">Submit Request</button>
       <button type="button" class="cancel-btn" onclick="confirmCancel()">Cancel</button>
     </div>
+
+    </div>
+    <div id="message" role="status" aria-live="polite" aria-atomic="true"></div>
   </form>
 
   <script src="config.js"></script>

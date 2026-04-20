@@ -11,6 +11,7 @@ function tomorrow() {
 async function fillValidForm(page) {
   const date = tomorrow();
   await page.selectOption('#ward', '8th Ward');
+  await page.selectOption('#request', 'building_access');
   await page.fill('#name', 'John Test');
   await page.fill('#email', 'test@example.com');
   await page.fill('#startDate', date);
@@ -50,6 +51,7 @@ test.describe('Form filling and auto-select', () => {
   });
 
   test('time dropdowns have correct options', async ({ page }) => {
+    await page.selectOption('#request', 'building_access');
     const startOptions = page.locator('#startTime option');
     await expect(startOptions).toHaveCount(37); // 36 time slots + placeholder
     await expect(startOptions.nth(1)).toHaveText('6:00 AM');
@@ -57,6 +59,7 @@ test.describe('Form filling and auto-select', () => {
   });
 
   test('setting start date auto-fills default times and syncs end date', async ({ page }) => {
+    await page.selectOption('#request', 'building_access');
     const date = tomorrow();
     await page.fill('#startDate', date);
     await page.locator('#startDate').dispatchEvent('blur');
@@ -71,6 +74,7 @@ test.describe('Form filling and auto-select', () => {
 
     await expect(page.locator('#ward')).toHaveValue('8th Ward');
     await expect(page.locator('#building')).toHaveValue('Stake Center');
+    await expect(page.locator('#request')).toHaveValue('building_access');
     await expect(page.locator('#name')).toHaveValue('John Test');
     await expect(page.locator('#email')).toHaveValue('test@example.com');
     await expect(page.locator('#startTime')).toHaveValue('8:00 AM');
@@ -84,7 +88,8 @@ test.describe('Validation', () => {
     await page.goto('/');
   });
 
-  test('submitting empty form does not show success message', async ({ page }) => {
+  test('submitting empty form triggers browser validation', async ({ page }) => {
+    await page.selectOption('#request', 'building_access');
     await page.click('.submit-btn');
     await expect(page.locator('#message')).toHaveText('');
   });
@@ -96,6 +101,7 @@ test.describe('Validation', () => {
     const dayAfterStr = dayAfter.toISOString().split('T')[0];
 
     await page.selectOption('#ward', '8th Ward');
+    await page.selectOption('#request', 'building_access');
     await page.fill('#name', 'John Test');
     await page.fill('#email', 'test@example.com');
     await page.selectOption('#startTime', '8:00 AM');
@@ -116,6 +122,7 @@ test.describe('Validation', () => {
   test('same-day end time before start time shows error', async ({ page }) => {
     const date = tomorrow();
     await page.selectOption('#ward', '8th Ward');
+    await page.selectOption('#request', 'building_access');
     await page.fill('#name', 'John Test');
     await page.fill('#email', 'test@example.com');
     await page.fill('#startDate', date);
@@ -132,6 +139,7 @@ test.describe('Validation', () => {
   test('same-day equal start and end time shows error', async ({ page }) => {
     const date = tomorrow();
     await page.selectOption('#ward', '8th Ward');
+    await page.selectOption('#request', 'building_access');
     await page.fill('#name', 'John Test');
     await page.fill('#email', 'test@example.com');
     await page.fill('#startDate', date);
@@ -171,6 +179,7 @@ test.describe('Submission', () => {
     const data = JSON.parse(decoded);
     expect(data.ward).toBe('8th Ward');
     expect(data.building).toBe('Stake Center');
+    expect(data.request).toBe('building_access');
     expect(data.name).toBe('John Test');
     expect(data.email).toBe('test@example.com');
     expect(data.startTime).toBe('8:00 AM');
@@ -189,10 +198,9 @@ test.describe('Submission', () => {
 
     await expect(page.locator('#message')).toHaveText('Request submitted successfully!');
 
-    // Form fields should be reset
-    await expect(page.locator('#name')).toHaveValue('');
-    await expect(page.locator('#email')).toHaveValue('');
-    await expect(page.locator('#purpose')).toHaveValue('');
+    // Form should revert to initial view
+    await expect(page.locator('#requestContent')).toHaveClass(/hidden/);
+    await expect(page.locator('#usageNote')).not.toHaveClass(/hidden/);
   });
 
   test('network error shows error message', async ({ page }) => {
@@ -211,6 +219,7 @@ test.describe('Submission', () => {
 test.describe('Cancel button', () => {
   test('cancel with empty form resets without confirm dialog', async ({ page }) => {
     await page.goto('/');
+    await page.selectOption('#request', 'building_access');
 
     // Override confirm to track if it's called
     await page.evaluate(() => {
@@ -225,6 +234,7 @@ test.describe('Cancel button', () => {
 
   test('cancel with filled form shows confirm dialog', async ({ page }) => {
     await page.goto('/');
+    await page.selectOption('#request', 'building_access');
     await page.fill('#name', 'John Test');
 
     await page.evaluate(() => {
@@ -239,6 +249,7 @@ test.describe('Cancel button', () => {
 
   test('confirming cancel clears the form', async ({ page }) => {
     await page.goto('/');
+    await page.selectOption('#request', 'building_access');
     await page.fill('#name', 'John Test');
 
     await page.evaluate(() => {
@@ -246,7 +257,8 @@ test.describe('Cancel button', () => {
     });
 
     await page.click('.cancel-btn');
-    await expect(page.locator('#name')).toHaveValue('');
+    await expect(page.locator('#requestContent')).toHaveClass(/hidden/);
+    await expect(page.locator('#usageNote')).not.toHaveClass(/hidden/);
   });
 });
 
