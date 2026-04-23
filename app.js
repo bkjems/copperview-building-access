@@ -32,15 +32,13 @@ allWards.forEach(function(w) {
 function populateTimeDropdown(selectName) {
   var select = document.querySelector('select[name="' + selectName + '"]');
   for (var h = 6; h <= 23; h++) {
-    for (var m = 0; m < 60; m += 30) {
-      var h12 = h % 12 || 12;
-      var ampm = h >= 12 ? 'PM' : 'AM';
-      var label = h12 + ':' + String(m).padStart(2, '0') + ' ' + ampm;
-      var opt = document.createElement('option');
-      opt.value = label;
-      opt.textContent = (h === 12 && m === 0) ? '12:00 PM (Noon)' : label;
-      select.appendChild(opt);
-    }
+    var h12 = h % 12 || 12;
+    var ampm = h >= 12 ? 'PM' : 'AM';
+    var label = h12 + ':00 ' + ampm;
+    var opt = document.createElement('option');
+    opt.value = label;
+    opt.textContent = (h === 12) ? '12:00 PM (Noon)' : label;
+    select.appendChild(opt);
   }
 }
 populateTimeDropdown('startTime');
