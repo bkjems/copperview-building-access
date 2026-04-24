@@ -83,6 +83,7 @@ function confirmCancel() {
     document.getElementById('message').textContent = '';
     document.getElementById('requestContent').classList.add('hidden');
     document.getElementById('usageNote').classList.remove('hidden');
+    document.getElementById('schedulerReminder').classList.add('hidden');
   }
 }
 
@@ -148,7 +149,8 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
     msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
     form.reset();
     document.getElementById('requestContent').classList.add('hidden');
-    document.getElementById('usageNote').classList.remove('hidden');
+    document.getElementById('usageNote').classList.add('hidden');
+    document.getElementById('schedulerReminder').classList.add('hidden');
     submitBtn.disabled = false;
     submitBtn.textContent = 'Submit Request';
     setTimeout(function() { msg.textContent = ''; }, 9000);
