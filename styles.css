@@ -39,7 +39,7 @@ input, select, textarea {
 }
 textarea {
   resize: vertical;
-  font-size: 0.6rem;
+  font-size: 0.8rem;
 }
 input[type="date"], input[type="time"] {
   text-align: left;
@@ -51,6 +51,7 @@ input[type="time"]::-webkit-date-and-time-value {
   text-align: left;
 }
 .field-hint { font-size: 0.8rem; color: #888; margin: 4px 0 0; }
+.field-reminder { color: #e6a817; }
 select { padding: 16px 10px; }
 input::placeholder { color: #888; font-size: 1rem; }
 textarea::placeholder { color: #888; font-size: 0.75rem; }

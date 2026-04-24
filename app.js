@@ -28,22 +28,6 @@ allWards.forEach(function(w) {
   wardSelect.appendChild(opt);
 });
 
-// Populate time dropdowns
-function populateTimeDropdown(selectName) {
-  var select = document.querySelector('select[name="' + selectName + '"]');
-  for (var h = 6; h <= 23; h++) {
-    var h12 = h % 12 || 12;
-    var ampm = h >= 12 ? 'PM' : 'AM';
-    var label = h12 + ':00 ' + ampm;
-    var opt = document.createElement('option');
-    opt.value = label;
-    opt.textContent = (h === 12) ? '12:00 PM (Noon)' : label;
-    select.appendChild(opt);
-  }
-}
-populateTimeDropdown('startTime');
-populateTimeDropdown('endTime');
-
 // Populate building dropdown
 var buildingSelect = document.querySelector('select[name="building"]');
 CONFIG.buildings.forEach(function(b) {
@@ -64,6 +48,7 @@ document.getElementById('request').addEventListener('change', function() {
   var requestContent = document.getElementById('requestContent');
 
   usageNote.classList.toggle('hidden', !!this.value);
+  document.getElementById('schedulerReminder').classList.toggle('hidden', this.value !== 'building_access');
   var isLockup = this.value !== 'building_access';
   var nameEmailFields = document.getElementById('nameEmailFields');
   var tempFields = document.getElementById('temporaryFields');
@@ -78,9 +63,8 @@ document.getElementById('request').addEventListener('change', function() {
   nameEmailFields.querySelectorAll('input').forEach(function(el) {
     el.required = this.value && !isLockup;
   }.bind(this));
-  tempFields.querySelectorAll('input, select').forEach(function(el) {
-    if (el.name !== 'purpose') el.required = this.value && !isLockup;
-  }.bind(this));
+  var accessInfo = document.getElementById('accessInfo');
+  accessInfo.required = this.value && !isLockup;
   var bulkChanges = document.getElementById('bulkChanges');
   var bulkHint = document.getElementById('bulkHint');
   bulkChanges.required = isLockup;
@@ -91,39 +75,9 @@ document.getElementById('request').addEventListener('change', function() {
   }
 });
 
-// Set min date on date fields to today
-function setMinDates() {
-  var today = new Date().toISOString().split('T')[0];
-  document.querySelector('input[name="startDate"]').min = today;
-  document.querySelector('input[name="endDate"]').min = today;
-}
-setMinDates();
-
-var lastStartDate = '';
-var lastEndDate = '';
-
-document.querySelector('input[name="startDate"]').addEventListener('blur', function() {
-  var form = this.form;
-  if (!form.startDate.value || form.startDate.value === lastStartDate) return;
-  lastStartDate = form.startDate.value;
-  if (!form.startTime.value) form.startTime.value = '8:00 AM';
-  form.endDate.min = form.startDate.value;
-  if (!form.endDate.value || form.endDate.value < form.startDate.value) {
-    form.endDate.value = form.startDate.value;
-  }
-  if (!form.endTime.value) form.endTime.value = '10:00 PM';
-});
-
-document.querySelector('input[name="endDate"]').addEventListener('blur', function() {
-  var form = this.form;
-  if (!form.endDate.value || form.endDate.value === lastEndDate) return;
-  lastEndDate = form.endDate.value;
-  if (!form.endTime.value) form.endTime.value = '10:00 PM';
-});
-
 function confirmCancel() {
   var form = document.getElementById('licenseForm');
-  var hasInput = form.name.value || form.email.value || form.purpose.value || form.startDate.value || form.endDate.value;
+  var hasInput = form.name.value || form.email.value || form.accessInfo.value;
   if (!hasInput || confirm('Are you sure you want to clear the form?')) {
     form.reset();
     document.getElementById('message').textContent = '';
@@ -145,7 +99,7 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
   // Trim whitespace
   form.name.value = form.name.value.trim();
   form.email.value = form.email.value.trim();
-  if (form.purpose.value) form.purpose.value = form.purpose.value.trim();
+  if (form.accessInfo.value) form.accessInfo.value = form.accessInfo.value.trim();
   if (form.bulkChanges.value) form.bulkChanges.value = form.bulkChanges.value.trim();
 
   if (!form.checkValidity()) {
@@ -162,42 +116,6 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
 
   var isLockup = form.request.value !== 'building_access';
 
-  if (!isLockup) {
-    var today = new Date();
-    today.setHours(0, 0, 0, 0);
-    var startParts = form.startDate.value.split('-');
-    var startDate = new Date(startParts[0], startParts[1] - 1, startParts[2]);
-    var endParts = form.endDate.value.split('-');
-    var endDate = new Date(endParts[0], endParts[1] - 1, endParts[2]);
-
-    if (startDate < today) {
-      showError('Start date cannot be in the past.');
-      return;
-    }
-    if (endDate < today) {
-      showError('End date cannot be in the past.');
-      return;
-    }
-    if (endDate < startDate) {
-      showError('End date cannot be before start date.');
-      return;
-    }
-    if (startDate.getTime() === endDate.getTime() && form.startTime.value && form.endTime.value) {
-      var toMinutes = function(t) {
-        var parts = t.match(/(\d+):(\d+)\s*(AM|PM)/i);
-        var h = parseInt(parts[1]);
-        var m = parseInt(parts[2]);
-        if (parts[3].toUpperCase() === 'PM' && h !== 12) h += 12;
-        if (parts[3].toUpperCase() === 'AM' && h === 12) h = 0;
-        return h * 60 + m;
-      };
-      if (toMinutes(form.endTime.value) <= toMinutes(form.startTime.value)) {
-        showError('End time must be after start time on the same day.');
-        return;
-      }
-    }
-  }
-
   var data = {
     ward: form.ward.value,
     building: form.building.value,
@@ -209,11 +127,7 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
   if (isLockup) {
     data.bulkChanges = form.bulkChanges.value.trim();
   } else {
-    data.purpose = form.purpose.value;
-    data.startDate = form.startDate.value;
-    data.startTime = form.startTime.value;
-    data.endDate = form.endDate.value;
-    data.endTime = form.endTime.value;
+    data.accessInfo = form.accessInfo.value.trim();
   }
 
   var submitBtn = form.querySelector('.submit-btn');
@@ -256,18 +170,11 @@ if (testParam) {
   autoSelectBuilding('8th Ward');
 
   if (testParam === 'true' || testParam === '1') {
-    var tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    var dateStr = tomorrow.toISOString().split('T')[0];
     form.request.value = 'building_access';
     form.request.dispatchEvent(new Event('change'));
     form.name.value = 'John Test';
     form.email.value = 'test@gmail.com';
-    form.startDate.value = dateStr;
-    form.startTime.value = '8:00 AM';
-    form.endDate.value = dateStr;
-    form.endTime.value = '10:00 PM';
-    form.purpose.value = 'Testing form submission';
+    form.accessInfo.value = '5/2 8am - 5/2 12pm\n5/9 8am - 5/9 8pm\nFamily Party';
   } else if (testParam === '2') {
     form.request.value = 'building_lockup';
     form.request.dispatchEvent(new Event('change'));

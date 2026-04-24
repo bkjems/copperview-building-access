@@ -29,6 +29,7 @@
       <option value="building_lockup">Schedule Building Lockup</option>
       <option value="custom_callings">Update Custom Calling(s)</option>
     </select>
+    <p id="schedulerReminder" class="field-hint field-reminder hidden">Requires building scheduler approval.</p>
 
     <p id="usageNote" class="access-note">Select a Ward, Building and choose your Request.</p>
 
@@ -43,24 +44,9 @@
     </div>
 
     <div id="temporaryFields">
-      <label for="startDate">Start Date</label>
-      <input id="startDate" type="date" name="startDate">
-
-      <label for="startTime">Start Time</label>
-      <select id="startTime" name="startTime">
-        <option value="">-- Select Time --</option>
-      </select>
-
-      <label for="endDate">End Date</label>
-      <input id="endDate" type="date" name="endDate">
-
-      <label for="endTime">End Time</label>
-      <select id="endTime" name="endTime">
-        <option value="">-- Select Time --</option>
-      </select>
-
-      <label for="purpose">Purpose</label>
-      <input id="purpose" type="text" name="purpose" maxlength="150">
+      <label for="accessInfo">Information</label>
+      <p class="field-hint">Enter dates, times, and purpose for access?</p>
+      <textarea id="accessInfo" name="accessInfo" rows="5"></textarea>
     </div>
 
     <div id="lockupFields" class="hidden">
