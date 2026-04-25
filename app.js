@@ -174,9 +174,9 @@ if (testParam) {
   if (testParam === 'true' || testParam === '1') {
     form.request.value = 'building_access';
     form.request.dispatchEvent(new Event('change'));
-    form.name.value = 'John Test';
+    form.name.value = 'Peter Wilson - test';
     form.email.value = 'test@gmail.com';
-    form.accessInfo.value = '5/2 8am - 5/2 12pm\n5/9 8am - 5/9 8pm\nFamily Party';
+    form.accessInfo.value = '5/2 8am-10pm\n5/9 8am-10pm\n5/12 8am-10pm\nPractice Organ';
   } else if (testParam === '2') {
     form.request.value = 'building_lockup';
     form.request.dispatchEvent(new Event('change'));
