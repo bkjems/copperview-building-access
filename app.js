@@ -42,6 +42,15 @@ function autoSelectBuilding(ward) {
   building.value = wardBuildingMap[ward] || "";
 }
 
+// Auto-grow textareas on input
+function autoGrow(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+document.querySelectorAll('textarea').forEach(function(ta) {
+  ta.addEventListener('input', function() { autoGrow(this); });
+});
+
 // Toggle fields based on request type
 document.getElementById('request').addEventListener('change', function() {
   var usageNote = document.getElementById('usageNote');
