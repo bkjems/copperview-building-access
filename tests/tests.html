@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Unit Tests — Building Access Form</title>
+  <style>
+    body { font-family: monospace; max-width: 800px; margin: 20px auto; padding: 0 15px; }
+    .pass { color: green; }
+    .fail { color: red; }
+    h2 { margin-top: 24px; }
+    #summary { font-size: 1.2em; font-weight: bold; margin: 20px 0; padding: 10px; border: 2px solid; }
+    #summary.all-pass { border-color: green; color: green; }
+    #summary.has-fail { border-color: red; color: red; }
+  </style>
+</head>
+<body class="light">
+  <h1>Unit Tests</h1>
+  <div id="summary"></div>
+  <div id="results"></div>
+
+  <!-- Hidden form that mirrors index.html structure -->
+  <div style="display:none">
+    <div id="stakeName"></div>
+    <form id="licenseForm">
+      <select name="ward"><option value="">-- Select Ward --</option></select>
+      <select name="building"><option value="">-- Select Building --</option></select>
+      <select id="request" name="request">
+        <option value="">-- Select Request --</option>
+        <option value="building_access">Building Access</option>
+        <option value="building_lockup">Schedule Building Lockup</option>
+        <option value="custom_callings">Update Custom Calling(s)</option>
+      </select>
+      <p id="schedulerReminder" class="hidden"></p>
+      <p id="usageNote"></p>
+      <div id="requestContent" class="hidden">
+        <div id="nameEmailFields">
+          <input type="text" name="name" maxlength="100">
+          <input type="email" name="email" maxlength="254">
+        </div>
+        <div id="temporaryFields">
+          <textarea id="accessInfo" name="accessInfo" rows="5"></textarea>
+        </div>
+        <div id="lockupFields" class="hidden">
+          <textarea id="bulkChanges" name="bulkChanges" rows="5"></textarea>
+          <p id="bulkHint"></p>
+        </div>
+        <button type="submit" class="submit-btn">Submit Request</button>
+      </div>
+      <div id="message"></div>
+    </form>
+    <button id="modeToggle"></button>
+  </div>
+
+  <script src="../config.js"></script>
+  <script src="../app.js"></script>
+  <script>
+    var passed = 0;
+    var failed = 0;
+    var results = document.getElementById('results');
+
+    function log(name, pass, detail) {
+      var div = document.createElement('div');
+      div.className = pass ? 'pass' : 'fail';
+      div.textContent = (pass ? 'PASS' : 'FAIL') + ': ' + name + (detail ? ' — ' + detail : '');
+      results.appendChild(div);
+      if (pass) passed++; else failed++;
+    }
+
+    function section(title) {
+      var h2 = document.createElement('h2');
+      h2.textContent = title;
+      results.appendChild(h2);
+    }
+
+    // ── Ward-Building Map ──
+    section('Ward-Building Map');
+
+    log('wardBuildingMap has all wards', Object.keys(wardBuildingMap).length === 9);
+
+    log('1st Ward maps to 2700 Building', wardBuildingMap['1st Ward'] === '2700 Building');
+    log('4th Ward maps to 3200 Building', wardBuildingMap['4th Ward'] === '3200 Building');
+    log('5th Ward maps to Stake Center', wardBuildingMap['5th Ward'] === 'Stake Center');
+    log('9th Ward maps to Stake Center', wardBuildingMap['9th Ward'] === 'Stake Center');
+
+    // ── autoSelectBuilding ──
+    section('Auto-Select Building');
+
+    var buildingSelect = document.querySelector('select[name="building"]');
+    autoSelectBuilding('1st Ward');
+    log('Selecting 1st Ward sets building to 2700 Building', buildingSelect.value === '2700 Building');
+
+    autoSelectBuilding('8th Ward');
+    log('Selecting 8th Ward sets building to Stake Center', buildingSelect.value === 'Stake Center');
+
+    autoSelectBuilding('');
+    log('Empty ward clears building', buildingSelect.value === '');
+
+    // ── Ward Dropdown Population ──
+    section('Dropdown Population');
+
+    var wardSelect = document.querySelector('select[name="ward"]');
+    log('Ward dropdown has 10 options (9 wards + placeholder)', wardSelect.options.length === 10);
+    log('First ward option is placeholder', wardSelect.options[0].value === '');
+    log('Second option is 1st Ward', wardSelect.options[1].value === '1st Ward');
+
+    var buildingOpts = document.querySelector('select[name="building"]');
+    log('Building dropdown has 4 options (3 buildings + placeholder)', buildingOpts.options.length === 4);
+
+    // ── Request Dropdown ──
+    section('Request Dropdown');
+
+    var requestSelect = document.querySelector('select[name="request"]');
+    log('Request dropdown has 4 options (3 types + placeholder)', requestSelect.options.length === 4);
+    log('First request option is placeholder', requestSelect.options[0].value === '');
+    log('Building access option exists', requestSelect.options[1].value === 'building_access');
+
+    // ── Title Population ──
+    section('Title Population');
+
+    log('Stake name populated', document.getElementById('stakeName').textContent === 'Copperview Stake');
+    log('Page title set', document.title === 'Copperview Stake — Temporary Building Access');
+
+    // ── Input Maxlength ──
+    section('Input Maxlength');
+
+    log('Name maxlength is 100', document.querySelector('input[name="name"]').maxLength === 100);
+    log('Email maxlength is 254', document.querySelector('input[name="email"]').maxLength === 254);
+
+    // ── Dark/Light Mode Toggle ──
+    section('Dark/Light Mode Toggle');
+
+    var body = document.body;
+    var modeBtn = document.getElementById('modeToggle');
+
+    // Start state
+    var startedLight = body.classList.contains('light');
+
+    toggleMode();
+    var afterFirstToggle = body.classList.contains('light');
+    log('Toggle removes light class', startedLight && !afterFirstToggle);
+
+    toggleMode();
+    var afterSecondToggle = body.classList.contains('light');
+    log('Toggle adds light class back', afterSecondToggle);
+
+    // ── confirmCancel ──
+    section('Cancel Confirmation');
+
+    var form = document.getElementById('licenseForm');
+    form.name.value = '';
+    form.email.value = '';
+    form.accessInfo.value = '';
+
+    // Empty form should reset without confirm
+    var originalConfirm = window.confirm;
+    var confirmCalled = false;
+    window.confirm = function() { confirmCalled = true; return false; };
+    confirmCancel();
+    log('Empty form does not trigger confirm dialog', !confirmCalled);
+
+    // Form with data should trigger confirm
+    form.name.value = 'Test';
+    confirmCalled = false;
+    confirmCancel();
+    log('Form with data triggers confirm dialog', confirmCalled);
+
+    window.confirm = originalConfirm;
+    form.name.value = '';
+
+    // ── Submit Button Disable ──
+    section('Submit Button');
+
+    var submitBtn = form.querySelector('.submit-btn');
+    log('Submit button exists', !!submitBtn);
+    log('Submit button starts enabled', !submitBtn.disabled);
+    log('Submit button text is "Submit Request"', submitBtn.textContent === 'Submit Request');
+
+    // ── Summary ──
+    var summary = document.getElementById('summary');
+    summary.textContent = passed + ' passed, ' + failed + ' failed';
+    summary.className = failed === 0 ? 'all-pass' : 'has-fail';
+  </script>
+</body>
+</html>
