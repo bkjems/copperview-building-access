@@ -24,21 +24,35 @@
     <form id="licenseForm">
       <select name="ward"><option value="">-- Select Ward --</option></select>
       <select name="building"><option value="">-- Select Building --</option></select>
-      <input type="text" name="name" required maxlength="100">
-      <input type="email" name="email" required maxlength="254">
-      <input type="date" name="startDate" required>
-      <select name="startTime" required><option value="">-- Select Time --</option></select>
-      <input type="date" name="endDate" required>
-      <select name="endTime" required><option value="">-- Select Time --</option></select>
-      <input type="text" name="purpose" maxlength="150">
+      <select id="request" name="request">
+        <option value="">-- Select Request --</option>
+        <option value="building_access">Building Access</option>
+        <option value="building_lockup">Schedule Building Lockup</option>
+        <option value="custom_callings">Update Custom Calling(s)</option>
+      </select>
+      <p id="schedulerReminder" class="hidden"></p>
+      <p id="usageNote"></p>
+      <div id="requestContent" class="hidden">
+        <div id="nameEmailFields">
+          <input type="text" name="name" maxlength="100">
+          <input type="email" name="email" maxlength="254">
+        </div>
+        <div id="temporaryFields">
+          <textarea id="accessInfo" name="accessInfo" rows="5"></textarea>
+        </div>
+        <div id="lockupFields" class="hidden">
+          <textarea id="bulkChanges" name="bulkChanges" rows="5"></textarea>
+          <p id="bulkHint"></p>
+        </div>
+        <button type="submit" class="submit-btn">Submit Request</button>
+      </div>
       <div id="message"></div>
-      <button type="submit" class="submit-btn">Submit Request</button>
     </form>
     <button id="modeToggle"></button>
   </div>
 
-  <script src="config.js"></script>
-  <script src="app.js"></script>
+  <script src="../config.js"></script>
+  <script src="../app.js"></script>
   <script>
     var passed = 0;
     var failed = 0;
@@ -92,28 +106,13 @@
     var buildingOpts = document.querySelector('select[name="building"]');
     log('Building dropdown has 4 options (3 buildings + placeholder)', buildingOpts.options.length === 4);
 
-    // ── Time Dropdown Population ──
-    section('Time Dropdown Population');
+    // ── Request Dropdown ──
+    section('Request Dropdown');
 
-    var startTimeSelect = document.querySelector('select[name="startTime"]');
-    var endTimeSelect = document.querySelector('select[name="endTime"]');
-    // 6:00 AM to 11:30 PM = 18 hours * 2 slots = 36 + 1 placeholder = 37
-    log('Start time has 37 options', startTimeSelect.options.length === 37,
-      'got ' + startTimeSelect.options.length);
-    log('End time has 37 options', endTimeSelect.options.length === 37);
-    log('First time option is placeholder', startTimeSelect.options[0].value === '');
-    log('Second time option is 6:00 AM', startTimeSelect.options[1].value === '6:00 AM');
-    log('Last time option is 11:30 PM', startTimeSelect.options[startTimeSelect.options.length - 1].value === '11:30 PM');
-
-    // Check noon label
-    var noonOption = null;
-    for (var i = 0; i < startTimeSelect.options.length; i++) {
-      if (startTimeSelect.options[i].value === '12:00 PM') {
-        noonOption = startTimeSelect.options[i];
-        break;
-      }
-    }
-    log('12:00 PM displays as "12:00 PM (Noon)"', noonOption && noonOption.textContent === '12:00 PM (Noon)');
+    var requestSelect = document.querySelector('select[name="request"]');
+    log('Request dropdown has 4 options (3 types + placeholder)', requestSelect.options.length === 4);
+    log('First request option is placeholder', requestSelect.options[0].value === '');
+    log('Building access option exists', requestSelect.options[1].value === 'building_access');
 
     // ── Title Population ──
     section('Title Population');
@@ -121,44 +120,11 @@
     log('Stake name populated', document.getElementById('stakeName').textContent === 'Copperview Stake');
     log('Page title set', document.title === 'Copperview Stake — Temporary Building Access');
 
-    // ── Min Date ──
-    section('Min Date');
-
-    var todayStr = new Date().toISOString().split('T')[0];
-    var startDateInput = document.querySelector('input[name="startDate"]');
-    var endDateInput = document.querySelector('input[name="endDate"]');
-    log('Start date min is today', startDateInput.min === todayStr);
-    log('End date min is today', endDateInput.min === todayStr);
-
     // ── Input Maxlength ──
     section('Input Maxlength');
 
     log('Name maxlength is 100', document.querySelector('input[name="name"]').maxLength === 100);
     log('Email maxlength is 254', document.querySelector('input[name="email"]').maxLength === 254);
-    log('Purpose maxlength is 150', document.querySelector('input[name="purpose"]').maxLength === 150);
-
-    // ── Time Parsing (toMinutes) ──
-    section('Time Parsing');
-
-    // Recreate toMinutes for testing
-    var toMinutes = function(t) {
-      var parts = t.match(/(\d+):(\d+)\s*(AM|PM)/i);
-      var h = parseInt(parts[1]);
-      var m = parseInt(parts[2]);
-      if (parts[3].toUpperCase() === 'PM' && h !== 12) h += 12;
-      if (parts[3].toUpperCase() === 'AM' && h === 12) h = 0;
-      return h * 60 + m;
-    };
-
-    log('6:00 AM = 360 minutes', toMinutes('6:00 AM') === 360);
-    log('12:00 AM = 0 minutes (midnight)', toMinutes('12:00 AM') === 0);
-    log('12:00 PM = 720 minutes (noon)', toMinutes('12:00 PM') === 720);
-    log('1:00 PM = 780 minutes', toMinutes('1:00 PM') === 780);
-    log('11:30 PM = 1410 minutes', toMinutes('11:30 PM') === 1410);
-    log('8:00 AM = 480 minutes', toMinutes('8:00 AM') === 480);
-    log('10:00 PM = 1320 minutes', toMinutes('10:00 PM') === 1320);
-    log('8:00 AM < 10:00 PM', toMinutes('8:00 AM') < toMinutes('10:00 PM'));
-    log('10:00 PM > 8:00 AM', toMinutes('10:00 PM') > toMinutes('8:00 AM'));
 
     // ── Dark/Light Mode Toggle ──
     section('Dark/Light Mode Toggle');
@@ -177,37 +143,13 @@
     var afterSecondToggle = body.classList.contains('light');
     log('Toggle adds light class back', afterSecondToggle);
 
-    // ── Date Validation Logic ──
-    section('Date Validation');
-
-    var today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    var yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    log('Yesterday is before today', yesterday < today);
-
-    var tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    log('Tomorrow is not before today', !(tomorrow < today));
-
-    var startDate = new Date(2026, 2, 28); // March 28
-    var endDate = new Date(2026, 2, 25);   // March 25
-    log('End before start detected', endDate < startDate);
-
-    var sameStart = new Date(2026, 2, 28);
-    var sameEnd = new Date(2026, 2, 28);
-    log('Same day detected', sameStart.getTime() === sameEnd.getTime());
-
     // ── confirmCancel ──
     section('Cancel Confirmation');
 
     var form = document.getElementById('licenseForm');
     form.name.value = '';
     form.email.value = '';
-    form.purpose.value = '';
-    form.startDate.value = '';
-    form.endDate.value = '';
+    form.accessInfo.value = '';
 
     // Empty form should reset without confirm
     var originalConfirm = window.confirm;
