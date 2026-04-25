@@ -176,7 +176,7 @@ if (testParam) {
     form.request.dispatchEvent(new Event('change'));
     form.name.value = 'Peter Wilson - test';
     form.email.value = 'test@gmail.com';
-    form.accessInfo.value = '5/2 8am-10pm\n5/9 8am-10pm\n5/12 8am-10pm\nPractice Organ';
+    form.accessInfo.value = '5/2 8am-10am\n5/9 8am-10am\n5/12 6pm-8pm\nPractice Organ';
   } else if (testParam === '2') {
     form.request.value = 'building_lockup';
     form.request.dispatchEvent(new Event('change'));
