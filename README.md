@@ -1,7 +1,7 @@
 # Copperview Temporary Building Access Form
 <!-- cSpell:ignore Copperview -->
 
-A web form for requesting temporary building access for church stake buildings. Hosted on GitHub Pages with a Google Apps Script backend for email notifications.
+A web form for requesting temporary building access for church buildings. Hosted on GitHub Pages with a Google Apps Script backend for email notifications.
 
 ## How It Works
 
@@ -38,7 +38,6 @@ var CONFIG = {
 - **Request type dropdown** — dynamically shows/hides fields based on selection
 - Building scheduler approval reminder for Building Access requests
 - Dark/light mode toggle
-- Auto-selects building based on ward
 - Input length limits (Name: 100, Email: 254)
 - Whitespace trimming on text inputs
 - Submit button disabled during submission to prevent duplicates

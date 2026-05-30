@@ -37,10 +37,6 @@ CONFIG.buildings.forEach(function(b) {
   buildingSelect.appendChild(opt);
 });
 
-function autoSelectBuilding(ward) {
-  var building = document.querySelector('select[name="building"]');
-  building.value = wardBuildingMap[ward] || "";
-}
 
 // Auto-grow textareas on input
 function autoGrow(el) {
@@ -178,7 +174,7 @@ var testParam = new URLSearchParams(window.location.search).get('test');
 if (testParam) {
   var form = document.getElementById('licenseForm');
   form.ward.value = '8th Ward';
-  autoSelectBuilding('8th Ward');
+  form.building.value = wardBuildingMap['8th Ward'] || '';
 
   if (testParam === 'true' || testParam === '1') {
     form.request.value = 'building_access';

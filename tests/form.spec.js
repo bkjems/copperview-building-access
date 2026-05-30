@@ -1,26 +1,13 @@
 const { test, expect } = require('playwright/test');
 
-// Helper: get tomorrow's date as YYYY-MM-DD
-function tomorrow() {
-  const d = new Date();
-  d.setDate(d.getDate() + 1);
-  return d.toISOString().split('T')[0];
-}
-
-// Helper: fill the form with valid data
+// Helper: fill the building_access form with valid data
 async function fillValidForm(page) {
-  const date = tomorrow();
   await page.selectOption('#ward', '8th Ward');
+  await page.selectOption('#building', 'Stake Center');
   await page.selectOption('#request', 'building_access');
   await page.fill('#name', 'John Test');
   await page.fill('#email', 'test@example.com');
-  await page.fill('#startDate', date);
-  await page.locator('#startDate').dispatchEvent('blur');
-  await page.selectOption('#startTime', '8:00 AM');
-  await page.fill('#endDate', date);
-  await page.locator('#endDate').dispatchEvent('blur');
-  await page.selectOption('#endTime', '10:00 PM');
-  await page.fill('#purpose', 'Testing');
+  await page.fill('#accessInfo', 'Tomorrow 8am - 10pm\nFamily Party');
 }
 
 test.describe('Form filling and auto-select', () => {
@@ -39,34 +26,29 @@ test.describe('Form filling and auto-select', () => {
     await expect(options.first()).toHaveText('-- Select Ward --');
   });
 
-  test('selecting a ward auto-selects the correct building', async ({ page }) => {
-    await page.selectOption('#ward', '1st Ward');
-    await expect(page.locator('#building')).toHaveValue('2700 Building');
-
-    await page.selectOption('#ward', '4th Ward');
-    await expect(page.locator('#building')).toHaveValue('3200 Building');
-
-    await page.selectOption('#ward', '8th Ward');
-    await expect(page.locator('#building')).toHaveValue('Stake Center');
+  test('selecting building_access shows name, email, and accessInfo fields', async ({ page }) => {
+    await page.selectOption('#request', 'building_access');
+    await expect(page.locator('#requestContent')).not.toHaveClass(/hidden/);
+    await expect(page.locator('#nameEmailFields')).not.toHaveClass(/hidden/);
+    await expect(page.locator('#temporaryFields')).not.toHaveClass(/hidden/);
+    await expect(page.locator('#lockupFields')).toHaveClass(/hidden/);
+    await expect(page.locator('#schedulerReminder')).not.toHaveClass(/hidden/);
   });
 
-  test('time dropdowns have correct options', async ({ page }) => {
-    await page.selectOption('#request', 'building_access');
-    const startOptions = page.locator('#startTime option');
-    await expect(startOptions).toHaveCount(37); // 36 time slots + placeholder
-    await expect(startOptions.nth(1)).toHaveText('6:00 AM');
-    await expect(startOptions.last()).toHaveText('11:30 PM');
+  test('selecting building_lockup shows bulkChanges and hides name/email', async ({ page }) => {
+    await page.selectOption('#request', 'building_lockup');
+    await expect(page.locator('#requestContent')).not.toHaveClass(/hidden/);
+    await expect(page.locator('#nameEmailFields')).toHaveClass(/hidden/);
+    await expect(page.locator('#temporaryFields')).toHaveClass(/hidden/);
+    await expect(page.locator('#lockupFields')).not.toHaveClass(/hidden/);
+    await expect(page.locator('#bulkHint')).toHaveText('Enter 1 or more: Name, Email, Date Range.');
   });
 
-  test('setting start date auto-fills default times and syncs end date', async ({ page }) => {
-    await page.selectOption('#request', 'building_access');
-    const date = tomorrow();
-    await page.fill('#startDate', date);
-    await page.locator('#startDate').dispatchEvent('blur');
-
-    await expect(page.locator('#startTime')).toHaveValue('8:00 AM');
-    await expect(page.locator('#endDate')).toHaveValue(date);
-    await expect(page.locator('#endTime')).toHaveValue('10:00 PM');
+  test('selecting custom_callings shows bulkChanges with calling hint', async ({ page }) => {
+    await page.selectOption('#request', 'custom_callings');
+    await expect(page.locator('#requestContent')).not.toHaveClass(/hidden/);
+    await expect(page.locator('#lockupFields')).not.toHaveClass(/hidden/);
+    await expect(page.locator('#bulkHint')).toHaveText('Enter 1 or more: Name, Email, Calling.');
   });
 
   test('form can be fully filled out', async ({ page }) => {
@@ -77,9 +59,7 @@ test.describe('Form filling and auto-select', () => {
     await expect(page.locator('#request')).toHaveValue('building_access');
     await expect(page.locator('#name')).toHaveValue('John Test');
     await expect(page.locator('#email')).toHaveValue('test@example.com');
-    await expect(page.locator('#startTime')).toHaveValue('8:00 AM');
-    await expect(page.locator('#endTime')).toHaveValue('10:00 PM');
-    await expect(page.locator('#purpose')).toHaveValue('Testing');
+    await expect(page.locator('#accessInfo')).toHaveValue('Tomorrow 8am - 10pm\nFamily Party');
   });
 });
 
@@ -93,72 +73,12 @@ test.describe('Validation', () => {
     await page.click('.submit-btn');
     await expect(page.locator('#message')).toHaveText('');
   });
-
-  test('end date before start date shows error', async ({ page }) => {
-    const date = tomorrow();
-    const dayAfter = new Date();
-    dayAfter.setDate(dayAfter.getDate() + 2);
-    const dayAfterStr = dayAfter.toISOString().split('T')[0];
-
-    await page.selectOption('#ward', '8th Ward');
-    await page.selectOption('#request', 'building_access');
-    await page.fill('#name', 'John Test');
-    await page.fill('#email', 'test@example.com');
-    await page.selectOption('#startTime', '8:00 AM');
-    await page.selectOption('#endTime', '10:00 PM');
-
-    // Set dates via JS to bypass browser min constraint that prevents
-    // endDate from being before startDate
-    await page.evaluate(({ start, end }) => {
-      const form = document.getElementById('licenseForm');
-      form.startDate.value = start;
-      form.endDate.value = end;
-    }, { start: dayAfterStr, end: date });
-
-    await page.click('.submit-btn');
-    await expect(page.locator('#message')).toHaveText('End date cannot be before start date.');
-  });
-
-  test('same-day end time before start time shows error', async ({ page }) => {
-    const date = tomorrow();
-    await page.selectOption('#ward', '8th Ward');
-    await page.selectOption('#request', 'building_access');
-    await page.fill('#name', 'John Test');
-    await page.fill('#email', 'test@example.com');
-    await page.fill('#startDate', date);
-    await page.locator('#startDate').dispatchEvent('blur');
-    await page.selectOption('#startTime', '10:00 PM');
-    await page.fill('#endDate', date);
-    await page.locator('#endDate').dispatchEvent('blur');
-    await page.selectOption('#endTime', '8:00 AM');
-
-    await page.click('.submit-btn');
-    await expect(page.locator('#message')).toHaveText('End time must be after start time on the same day.');
-  });
-
-  test('same-day equal start and end time shows error', async ({ page }) => {
-    const date = tomorrow();
-    await page.selectOption('#ward', '8th Ward');
-    await page.selectOption('#request', 'building_access');
-    await page.fill('#name', 'John Test');
-    await page.fill('#email', 'test@example.com');
-    await page.fill('#startDate', date);
-    await page.locator('#startDate').dispatchEvent('blur');
-    await page.selectOption('#startTime', '8:00 AM');
-    await page.fill('#endDate', date);
-    await page.locator('#endDate').dispatchEvent('blur');
-    await page.selectOption('#endTime', '8:00 AM');
-
-    await page.click('.submit-btn');
-    await expect(page.locator('#message')).toHaveText('End time must be after start time on the same day.');
-  });
 });
 
 test.describe('Submission', () => {
   test('successful submit sends correct payload and shows success', async ({ page }) => {
     let capturedBody = null;
 
-    // Intercept the Apps Script POST
     await page.route('**/macros/s/**', async (route) => {
       capturedBody = route.request().postData();
       await route.fulfill({ status: 200, body: 'ok' });
@@ -169,11 +89,8 @@ test.describe('Submission', () => {
 
     await page.click('.submit-btn');
 
-    // Button should show submitting state briefly
-    // Then success message appears
     await expect(page.locator('#message')).toHaveText('Request submitted successfully!');
 
-    // Verify payload contents
     expect(capturedBody).toBeTruthy();
     const decoded = decodeURIComponent(capturedBody).replace('data=', '');
     const data = JSON.parse(decoded);
@@ -182,9 +99,7 @@ test.describe('Submission', () => {
     expect(data.request).toBe('building_access');
     expect(data.name).toBe('John Test');
     expect(data.email).toBe('test@example.com');
-    expect(data.startTime).toBe('8:00 AM');
-    expect(data.endTime).toBe('10:00 PM');
-    expect(data.purpose).toBe('Testing');
+    expect(data.accessInfo).toBe('Tomorrow 8am - 10pm\nFamily Party');
   });
 
   test('form resets after successful submission', async ({ page }) => {
@@ -198,9 +113,8 @@ test.describe('Submission', () => {
 
     await expect(page.locator('#message')).toHaveText('Request submitted successfully!');
 
-    // Form should revert to initial view
     await expect(page.locator('#requestContent')).toHaveClass(/hidden/);
-    await expect(page.locator('#usageNote')).not.toHaveClass(/hidden/);
+    await expect(page.locator('#usageNote')).toHaveClass(/hidden/);
   });
 
   test('network error shows error message', async ({ page }) => {
@@ -221,7 +135,6 @@ test.describe('Cancel button', () => {
     await page.goto('/');
     await page.selectOption('#request', 'building_access');
 
-    // Override confirm to track if it's called
     await page.evaluate(() => {
       window._confirmCalled = false;
       window.confirm = () => { window._confirmCalled = true; return false; };
@@ -266,7 +179,6 @@ test.describe('Dark/light mode', () => {
   test('toggle switches between light and dark mode', async ({ page }) => {
     await page.goto('/');
 
-    // Starts in light mode
     await expect(page.locator('body')).toHaveClass('light');
 
     await page.click('#modeToggle');
