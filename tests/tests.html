@@ -82,19 +82,6 @@
     log('5th Ward maps to Stake Center', wardBuildingMap['5th Ward'] === 'Stake Center');
     log('9th Ward maps to Stake Center', wardBuildingMap['9th Ward'] === 'Stake Center');
 
-    // ── autoSelectBuilding ──
-    section('Auto-Select Building');
-
-    var buildingSelect = document.querySelector('select[name="building"]');
-    autoSelectBuilding('1st Ward');
-    log('Selecting 1st Ward sets building to 2700 Building', buildingSelect.value === '2700 Building');
-
-    autoSelectBuilding('8th Ward');
-    log('Selecting 8th Ward sets building to Stake Center', buildingSelect.value === 'Stake Center');
-
-    autoSelectBuilding('');
-    log('Empty ward clears building', buildingSelect.value === '');
-
     // ── Ward Dropdown Population ──
     section('Dropdown Population');
 

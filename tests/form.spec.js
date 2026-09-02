@@ -20,6 +20,10 @@ test.describe('Form filling and auto-select', () => {
     await expect(page.locator('#stakeName')).toHaveText('Copperview Stake');
   });
 
+  test('access note tells users to allow 24 hours', async ({ page }) => {
+    await expect(page.locator('.access-note').last()).toHaveText('Allow 24 hours for access.');
+  });
+
   test('ward dropdown has all 9 wards plus placeholder', async ({ page }) => {
     const options = page.locator('#ward option');
     await expect(options).toHaveCount(10);
