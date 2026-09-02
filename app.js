@@ -144,13 +144,25 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
 
   fetch(APPS_SCRIPT_URL, {
     method: 'POST',
-    mode: 'no-cors',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: 'data=' + encodeURIComponent(JSON.stringify(data))
   })
-  .then(function() {
+  .then(function(response) {
+    // Without this check an unreachable endpoint still reports success,
+    // because an opaque response looks identical to a real one.
+    if (!response.ok) {
+      var httpError = new Error('server error ' + response.status);
+      httpError.reachedServer = true;
+      throw httpError;
+    }
+    return response.text();
+  })
+  .then(function(text) {
+    var result = null;
+    try { result = JSON.parse(text); } catch (e) { /* not JSON; fall back below */ }
+
     msg.style.color = '#4caf50';
-    msg.textContent = 'Request submitted successfully!';
+    msg.textContent = (result && result.message) || 'Request submitted successfully!';
     msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
     form.reset();
     document.getElementById('requestContent').classList.add('hidden');
@@ -161,9 +173,10 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
     setTimeout(function() { msg.textContent = ''; }, 9000);
   })
   .catch(function(err) {
-    msg.style.color = '#f44336';
-    msg.textContent = 'Error: ' + err.message;
-    msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Network/CORS rejections carry browser-specific text ("Failed to fetch"),
+    // so only a real HTTP status is worth showing the user.
+    var reason = err.reachedServer ? err.message : 'could not reach the server';
+    showError('Not submitted — ' + reason + '. Try again, or contact Bro Weston if it keeps failing.');
     submitBtn.disabled = false;
     submitBtn.textContent = 'Submit Request';
   });

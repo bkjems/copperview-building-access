@@ -1,5 +1,8 @@
 const { test, expect } = require('playwright/test');
 
+// What the Apps Script endpoint actually returns on success.
+const SUCCESS_BODY = JSON.stringify({ message: 'Request submitted successfully!' });
+
 // Helper: fill the building_access form with valid data
 async function fillValidForm(page) {
   await page.selectOption('#ward', '8th Ward');
@@ -85,7 +88,7 @@ test.describe('Submission', () => {
 
     await page.route('**/macros/s/**', async (route) => {
       capturedBody = route.request().postData();
-      await route.fulfill({ status: 200, body: 'ok' });
+      await route.fulfill({ status: 200, contentType: 'application/json', body: SUCCESS_BODY });
     });
 
     await page.goto('/');
@@ -108,7 +111,7 @@ test.describe('Submission', () => {
 
   test('form resets after successful submission', async ({ page }) => {
     await page.route('**/macros/s/**', async (route) => {
-      await route.fulfill({ status: 200, body: 'ok' });
+      await route.fulfill({ status: 200, contentType: 'application/json', body: SUCCESS_BODY });
     });
 
     await page.goto('/');
@@ -130,7 +133,45 @@ test.describe('Submission', () => {
     await fillValidForm(page);
     await page.click('.submit-btn');
 
-    await expect(page.locator('#message')).toContainText('Error:');
+    await expect(page.locator('#message')).toContainText('Not submitted');
+    await expect(page.locator('#message')).toContainText('could not reach the server');
+    await expect(page.locator('#message')).toContainText('contact Bro Weston');
+    // Browser-specific wording like "Failed to fetch" should not leak through.
+    await expect(page.locator('#message')).not.toContainText('fetch');
+  });
+
+  // A 403 is what a revoked Apps Script authorization looks like. Before the
+  // mode: 'no-cors' fix the response was opaque and this reported success.
+  test('403 from the endpoint reports failure, not success', async ({ page }) => {
+    await page.route('**/macros/s/**', async (route) => {
+      await route.fulfill({ status: 403, contentType: 'text/html', body: '<title>Access Denied</title>' });
+    });
+
+    await page.goto('/');
+    await fillValidForm(page);
+    await page.click('.submit-btn');
+
+    await expect(page.locator('#message')).toContainText('Not submitted');
+    await expect(page.locator('#message')).toContainText('403');
+    await expect(page.locator('#message')).toContainText('contact Bro Weston');
+    await expect(page.locator('#message')).not.toContainText('successfully');
+
+    // The form must stay filled so the request is not silently lost.
+    await expect(page.locator('#requestContent')).not.toHaveClass(/hidden/);
+    await expect(page.locator('#name')).toHaveValue('John Test');
+    await expect(page.locator('.submit-btn')).toBeEnabled();
+  });
+
+  test('server error surfaces the status code', async ({ page }) => {
+    await page.route('**/macros/s/**', async (route) => {
+      await route.fulfill({ status: 500, body: 'boom' });
+    });
+
+    await page.goto('/');
+    await fillValidForm(page);
+    await page.click('.submit-btn');
+
+    await expect(page.locator('#message')).toContainText('500');
   });
 });
 
