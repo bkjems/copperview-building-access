@@ -40,6 +40,9 @@ test.describe('Form filling and auto-select', () => {
     await expect(page.locator('#temporaryFields')).not.toHaveClass(/hidden/);
     await expect(page.locator('#lockupFields')).toHaveClass(/hidden/);
     await expect(page.locator('#schedulerReminder')).not.toHaveClass(/hidden/);
+    // Hidden until the Apps Script side ships; see #acknowledgeRow in index.html.
+    await expect(page.locator('#acknowledge')).not.toBeVisible();
+    await expect(page.locator('#acknowledge')).not.toBeChecked();
   });
 
   test('selecting building_lockup shows bulkChanges and hides name/email', async ({ page }) => {
@@ -49,13 +52,25 @@ test.describe('Form filling and auto-select', () => {
     await expect(page.locator('#temporaryFields')).toHaveClass(/hidden/);
     await expect(page.locator('#lockupFields')).not.toHaveClass(/hidden/);
     await expect(page.locator('#bulkHint')).toHaveText('Enter 1 or more: Name, Email, Date Range.');
+    await expect(page.locator('#acknowledge')).not.toBeVisible();
   });
 
-  test('selecting custom_callings shows bulkChanges with calling hint', async ({ page }) => {
-    await page.selectOption('#request', 'custom_callings');
-    await expect(page.locator('#requestContent')).not.toHaveClass(/hidden/);
-    await expect(page.locator('#lockupFields')).not.toHaveClass(/hidden/);
-    await expect(page.locator('#bulkHint')).toHaveText('Enter 1 or more: Name, Email, Calling.');
+  // Un-skip these three when #acknowledgeRow loses its "hidden" class —
+  // page.check() can't act on a hidden element.
+  test.skip('switching away from building_access clears the acknowledgement box', async ({ page }) => {
+    await page.selectOption('#request', 'building_access');
+    await page.check('#acknowledge');
+    await page.selectOption('#request', 'building_lockup');
+    await page.selectOption('#request', 'building_access');
+    await expect(page.locator('#acknowledge')).not.toBeChecked();
+  });
+
+  test('request dropdown offers only building access and lockup', async ({ page }) => {
+    const options = page.locator('#request option');
+    await expect(options).toHaveCount(3);
+    // toHaveValue is for inputs; an <option>'s value is a plain attribute.
+    await expect(options.nth(1)).toHaveAttribute('value', 'building_access');
+    await expect(options.nth(2)).toHaveAttribute('value', 'building_lockup');
   });
 
   test('form can be fully filled out', async ({ page }) => {
@@ -107,6 +122,53 @@ test.describe('Submission', () => {
     expect(data.name).toBe('John Test');
     expect(data.email).toBe('test@example.com');
     expect(data.accessInfo).toBe('Tomorrow 8am - 10pm\nFamily Party');
+    expect(data.acknowledge).toBe(false);
+  });
+
+  // Apps Script checks for an explicit true, so the key must be a real boolean
+  // in both directions — not omitted when the box is left alone.
+  test.skip('ticking the acknowledgement box sends acknowledge: true', async ({ page }) => {
+    let capturedBody = null;
+
+    await page.route('**/macros/s/**', async (route) => {
+      capturedBody = route.request().postData();
+      await route.fulfill({ status: 200, contentType: 'application/json', body: SUCCESS_BODY });
+    });
+
+    await page.goto('/');
+    await fillValidForm(page);
+    await page.check('#acknowledge');
+
+    await page.click('.submit-btn');
+
+    await expect(page.locator('#message')).toHaveText('Request submitted successfully!');
+
+    const data = JSON.parse(decodeURIComponent(capturedBody).replace('data=', ''));
+    expect(data.acknowledge).toBe(true);
+  });
+
+  // Lockup is a bulk submission with no single requester address, so the key
+  // must not appear at all.
+  test('lockup submission omits acknowledge', async ({ page }) => {
+    let capturedBody = null;
+
+    await page.route('**/macros/s/**', async (route) => {
+      capturedBody = route.request().postData();
+      await route.fulfill({ status: 200, contentType: 'application/json', body: SUCCESS_BODY });
+    });
+
+    await page.goto('/');
+    await page.selectOption('#ward', '8th Ward');
+    await page.selectOption('#building', 'Stake Center');
+    await page.selectOption('#request', 'building_lockup');
+    await page.fill('#bulkChanges', 'John Smith, js@example.com 4/24/26 - 4/26/26');
+
+    await page.click('.submit-btn');
+
+    await expect(page.locator('#message')).toHaveText('Request submitted successfully!');
+
+    const data = JSON.parse(decodeURIComponent(capturedBody).replace('data=', ''));
+    expect(data.acknowledge).toBeUndefined();
   });
 
   test('form resets after successful submission', async ({ page }) => {
@@ -194,6 +256,22 @@ test.describe('Cancel button', () => {
     await page.goto('/');
     await page.selectOption('#request', 'building_access');
     await page.fill('#name', 'John Test');
+
+    await page.evaluate(() => {
+      window._confirmCalled = false;
+      window.confirm = () => { window._confirmCalled = true; return true; };
+    });
+
+    await page.click('.cancel-btn');
+    const confirmCalled = await page.evaluate(() => window._confirmCalled);
+    expect(confirmCalled).toBe(true);
+  });
+
+  // The checkbox is user input too — cancelling must not discard it silently.
+  test.skip('cancel with only the acknowledgement box ticked shows confirm dialog', async ({ page }) => {
+    await page.goto('/');
+    await page.selectOption('#request', 'building_access');
+    await page.check('#acknowledge');
 
     await page.evaluate(() => {
       window._confirmCalled = false;
