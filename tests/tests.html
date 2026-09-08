@@ -28,7 +28,6 @@
         <option value="">-- Select Request --</option>
         <option value="building_access">Building Access</option>
         <option value="building_lockup">Schedule Building Lockup</option>
-        <option value="custom_callings">Update Custom Calling(s)</option>
       </select>
       <p id="schedulerReminder" class="hidden"></p>
       <p id="usageNote"></p>
@@ -39,6 +38,7 @@
         </div>
         <div id="temporaryFields">
           <textarea id="accessInfo" name="accessInfo" rows="5"></textarea>
+          <input id="acknowledge" type="checkbox" name="acknowledge">
         </div>
         <div id="lockupFields" class="hidden">
           <textarea id="bulkChanges" name="bulkChanges" rows="5"></textarea>
@@ -97,7 +97,7 @@
     section('Request Dropdown');
 
     var requestSelect = document.querySelector('select[name="request"]');
-    log('Request dropdown has 4 options (3 types + placeholder)', requestSelect.options.length === 4);
+    log('Request dropdown has 3 options (2 types + placeholder)', requestSelect.options.length === 3);
     log('First request option is placeholder', requestSelect.options[0].value === '');
     log('Building access option exists', requestSelect.options[1].value === 'building_access');
 
@@ -137,6 +137,7 @@
     form.name.value = '';
     form.email.value = '';
     form.accessInfo.value = '';
+    form.acknowledge.checked = false;
 
     // Empty form should reset without confirm
     var originalConfirm = window.confirm;

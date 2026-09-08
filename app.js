@@ -70,19 +70,20 @@ document.getElementById('request').addEventListener('change', function() {
   }.bind(this));
   var accessInfo = document.getElementById('accessInfo');
   accessInfo.required = this.value && !isLockup;
+  // Optional, so never required — but clear it when the field is hidden, or a
+  // stale tick would ride along on a later building_access submission.
+  if (isLockup) document.getElementById('acknowledge').checked = false;
   var bulkChanges = document.getElementById('bulkChanges');
   var bulkHint = document.getElementById('bulkHint');
   bulkChanges.required = isLockup;
-  if (this.value === 'building_lockup') {
-    bulkHint.textContent = 'Enter 1 or more: Name, Email, Date Range.';
-  } else {
-    bulkHint.textContent = 'Enter 1 or more: Name, Email, Calling.';
-  }
+  // Lockup is the only request that uses this field, so the hint is fixed.
+  bulkHint.textContent = 'Enter 1 or more: Name, Email, Date Range.';
 });
 
 function confirmCancel() {
   var form = document.getElementById('licenseForm');
-  var hasInput = form.name.value || form.email.value || form.accessInfo.value;
+  var hasInput = form.name.value || form.email.value || form.accessInfo.value ||
+    form.acknowledge.checked;
   if (!hasInput || confirm('Are you sure you want to clear the form?')) {
     form.reset();
     document.getElementById('message').textContent = '';
@@ -134,6 +135,9 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
     data.bulkChanges = form.bulkChanges.value.trim();
   } else {
     data.accessInfo = form.accessInfo.value.trim();
+    // Always send the boolean. Apps Script checks for an explicit true, so an
+    // omitted key must never be mistaken for consent.
+    data.acknowledge = form.acknowledge.checked;
   }
 
   var submitBtn = form.querySelector('.submit-btn');
@@ -195,13 +199,10 @@ if (testParam) {
     form.name.value = 'Peter Wilson - test';
     form.email.value = 'test@gmail.com';
     form.accessInfo.value = '5/2 8am-10am\n5/9 8am-10am\n5/12 6pm-8pm\nPractice Organ';
+    form.acknowledge.checked = true;
   } else if (testParam === '2') {
     form.request.value = 'building_lockup';
     form.request.dispatchEvent(new Event('change'));
     form.bulkChanges.value = 'John Smith, jsmith@gmail.com 4/24/26 - 4/26/26\nBill Johnson, bjohnson@gmail.com 4/26/26 - 4/28/26\nTim Anderson, tadner@gmail.com 4/28/26 - 4/30/26';
-  } else if (testParam === '3') {
-    form.request.value = 'custom_callings';
-    form.request.dispatchEvent(new Event('change'));
-    form.bulkChanges.value = 'Will Smith, wismith@gmail.com Calling 1\nAaron Johnson, aajhnson@gmail.com Activities Committee Chairman\nChad Wilkins, kadner@gmail.com Building Representative';
   }
 }

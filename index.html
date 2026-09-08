@@ -27,7 +27,6 @@
       <option value="">-- Select Request --</option>
       <option value="building_access">Building Access</option>
       <option value="building_lockup">Schedule Building Lockup</option>
-      <option value="custom_callings">Update Custom Calling(s)</option>
     </select>
     <p id="schedulerReminder" class="field-hint field-reminder hidden">Requires building scheduler approval.</p>
 
@@ -47,6 +46,16 @@
       <label for="accessInfo">Information</label>
       <p class="field-hint">Provide date, time, and purpose for building request.</p>
       <textarea id="accessInfo" name="accessInfo" rows="5"></textarea>
+
+      <!-- Hidden until the Apps Script side is deployed with
+           ENABLE_CONFIRMATION_EMAIL = true. To turn on: drop "hidden" below.
+           Kept in the DOM rather than commented out because app.js reads
+           #acknowledge in four places and would throw on null. While hidden it
+           stays unchecked, so submissions send acknowledge: false. -->
+      <div id="acknowledgeRow" class="checkbox-row hidden">
+        <input id="acknowledge" type="checkbox" name="acknowledge">
+        <label for="acknowledge">Send me a confirmation email.</label>
+      </div>
     </div>
 
     <div id="lockupFields" class="hidden">

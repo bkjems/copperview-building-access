@@ -7,9 +7,8 @@ A web form for requesting temporary building access for church buildings. Hosted
 
 1. User selects a ward, building, and request type
 2. Based on the request type, the appropriate fields are shown:
-   - **Building Access** — name, email, free-text information (dates, times, purpose)
+   - **Building Access** — name, email, free-text information (dates, times, purpose), and an optional "email me a confirmation" checkbox
    - **Schedule Building Lockup** — bulk information textarea (name, email, date range)
-   - **Update Custom Calling** — bulk information textarea (name, email, calling)
 3. Form submits data to a Google Apps Script backend
 4. Apps Script sends an email notification to the building manager
 
@@ -47,3 +46,4 @@ var CONFIG = {
 - Browser autofill styled to match dark/light theme
 - Mobile responsive
 - Email notifications to building managers with dynamic subject/heading based on request type
+- Opt-in confirmation email to the requester (Building Access only) — the manager's copy shows whether one was requested. Gated in Apps Script by `ENABLE_CONFIRMATION_EMAIL`, so the checkbox can be tested before it goes live
