@@ -5,7 +5,7 @@ if [ -z "$1" ]; then
   echo "Usage: ./auto-submit.sh 'email,Name - Ward - Purpose,MM/DD/YYYY,Start Time,MM/DD/YYYY,End Time,Building'"
   echo ""
   echo "Example:"
-  echo "  ./auto-submit.sh 'test@gmail.com,John Test - 8th Ward - Testing,04/22/2026,8:00 AM,04/22/2026,10:00 PM,Stake Center'"
+  echo "  ./auto-submit.sh 'test@example.com,John Test - 8th Ward - Testing,04/22/2026,8:00 AM,04/22/2026,10:00 PM,Stake Center'"
   exit 1
 fi
 
