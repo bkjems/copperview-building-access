@@ -197,12 +197,12 @@ if (testParam) {
     form.request.value = 'building_access';
     form.request.dispatchEvent(new Event('change'));
     form.name.value = 'Peter Wilson - test';
-    form.email.value = 'test@gmail.com';
+    form.email.value = 'test@example.com';
     form.accessInfo.value = '5/2 8am-10am\n5/9 8am-10am\n5/12 6pm-8pm\nPractice Organ';
     form.acknowledge.checked = true;
   } else if (testParam === '2') {
     form.request.value = 'building_lockup';
     form.request.dispatchEvent(new Event('change'));
-    form.bulkChanges.value = 'John Smith, jsmith@gmail.com 4/24/26 - 4/26/26\nBill Johnson, bjohnson@gmail.com 4/26/26 - 4/28/26\nTim Anderson, tadner@gmail.com 4/28/26 - 4/30/26';
+    form.bulkChanges.value = 'John Smith, jsmith@example.com 4/24/26 - 4/26/26\nBill Johnson, bjohnson@example.com 4/26/26 - 4/28/26\nTim Anderson, tadner@example.com 4/28/26 - 4/30/26';
   }
 }
