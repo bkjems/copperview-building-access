@@ -47,13 +47,39 @@ document.querySelectorAll('textarea').forEach(function(ta) {
   ta.addEventListener('input', function() { autoGrow(this); });
 });
 
+// The scheduler-approval dropdown only exists on index2.html, which in turn
+// drops #schedulerReminder. Hide whichever of these the page has.
+function hideApprovalFields() {
+  ['schedulerReminder', 'approvalRow', 'approvalWarning'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.add('hidden');
+  });
+}
+
+var approvedSelect = document.getElementById('approved');
+if (approvedSelect) {
+  approvedSelect.addEventListener('change', function() {
+    document.getElementById('approvalWarning').classList.toggle('hidden', this.value !== 'no');
+  });
+}
+
 // Toggle fields based on request type
 document.getElementById('request').addEventListener('change', function() {
   var usageNote = document.getElementById('usageNote');
   var requestContent = document.getElementById('requestContent');
 
   usageNote.classList.toggle('hidden', !!this.value);
-  document.getElementById('schedulerReminder').classList.toggle('hidden', this.value !== 'building_access');
+  var schedulerReminder = document.getElementById('schedulerReminder');
+  if (schedulerReminder) schedulerReminder.classList.toggle('hidden', this.value !== 'building_access');
+  if (approvedSelect) {
+    var isAccess = this.value === 'building_access';
+    document.getElementById('approvalRow').classList.toggle('hidden', !isAccess);
+    approvedSelect.required = isAccess;
+    if (!isAccess) {
+      approvedSelect.value = '';
+      document.getElementById('approvalWarning').classList.add('hidden');
+    }
+  }
   var isLockup = this.value !== 'building_access';
   var nameEmailFields = document.getElementById('nameEmailFields');
   var tempFields = document.getElementById('temporaryFields');
@@ -83,13 +109,13 @@ document.getElementById('request').addEventListener('change', function() {
 function confirmCancel() {
   var form = document.getElementById('licenseForm');
   var hasInput = form.name.value || form.email.value || form.accessInfo.value ||
-    form.acknowledge.checked;
+    form.acknowledge.checked || (approvedSelect && approvedSelect.value);
   if (!hasInput || confirm('Are you sure you want to clear the form?')) {
     form.reset();
     document.getElementById('message').textContent = '';
     document.getElementById('requestContent').classList.add('hidden');
     document.getElementById('usageNote').classList.remove('hidden');
-    document.getElementById('schedulerReminder').classList.add('hidden');
+    hideApprovalFields();
   }
 }
 
@@ -138,6 +164,7 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
     // Always send the boolean. Apps Script checks for an explicit true, so an
     // omitted key must never be mistaken for consent.
     data.acknowledge = form.acknowledge.checked;
+    if (approvedSelect) data.approved = approvedSelect.value;
   }
 
   var submitBtn = form.querySelector('.submit-btn');
@@ -171,7 +198,7 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
     form.reset();
     document.getElementById('requestContent').classList.add('hidden');
     document.getElementById('usageNote').classList.add('hidden');
-    document.getElementById('schedulerReminder').classList.add('hidden');
+    hideApprovalFields();
     submitBtn.disabled = false;
     submitBtn.textContent = 'Submit Request';
     setTimeout(function() { msg.textContent = ''; }, 9000);
@@ -200,6 +227,10 @@ if (testParam) {
     form.email.value = 'test@example.com';
     form.accessInfo.value = '5/2 8am-10am\n5/9 8am-10am\n5/12 6pm-8pm\nPractice Organ';
     form.acknowledge.checked = true;
+    if (approvedSelect) {
+      approvedSelect.value = 'yes';
+      approvedSelect.dispatchEvent(new Event('change'));
+    }
   } else if (testParam === '2') {
     form.request.value = 'building_lockup';
     form.request.dispatchEvent(new Event('change'));

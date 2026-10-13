@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Copperview Stake - Temporary Building Access</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="light">
+  <div class="header">
+    <h2><span id="stakeName"></span><br><span class="header-subtitle">Temporary Building Access</span></h2>
+    <button type="button" id="modeToggle" onclick="toggleMode()" aria-label="Toggle light and dark mode">&#9789;</button>
+  </div>
+  <form id="licenseForm">
+    <label for="ward">Ward</label>
+    <select id="ward" name="ward" required>
+      <option value="">-- Select Ward --</option>
+    </select>
+
+    <label for="building">Building</label>
+    <select id="building" name="building" required>
+      <option value="">-- Select Building --</option>
+    </select>
+
+    <label for="request">Request</label>
+    <select id="request" name="request" required>
+      <option value="">-- Select Request --</option>
+      <option value="building_access">Building Access</option>
+      <option value="building_lockup">Schedule Building Lockup</option>
+    </select>
+    <!-- Test page for the scheduler-approval dropdown. Same as index.html except
+         this block replaces #schedulerReminder. app.js only touches #approved
+         when it exists, so index.html is unaffected. -->
+    <div id="approvalRow" class="hidden">
+      <label for="approved">Did you get approval from the building scheduler?</label>
+      <select id="approved" name="approved">
+        <option value="">-- Select --</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+      <p id="approvalWarning" class="field-hint field-reminder hidden">Without scheduler approval, your request may be overridden by anyone who has building approval for this date and time.</p>
+    </div>
+
+    <p id="usageNote" class="access-note">Select your Ward, a Building and choose your Request.</p>
+
+    <div id="requestContent" class="hidden">
+
+    <div id="nameEmailFields">
+      <label for="name">Name</label>
+      <input id="name" type="text" name="name" maxlength="100" autocomplete="name">
+
+      <label for="email">Email</label>
+      <input id="email" type="email" name="email" maxlength="254" placeholder="Enter your church email" autocomplete="email">
+    </div>
+
+    <div id="temporaryFields">
+      <label for="accessInfo">Information</label>
+      <p class="field-hint">Provide date, time, and purpose for building request.</p>
+      <textarea id="accessInfo" name="accessInfo" rows="5"></textarea>
+
+      <!-- Hidden until the Apps Script side is deployed with
+           ENABLE_CONFIRMATION_EMAIL = true. To turn on: drop "hidden" below.
+           Kept in the DOM rather than commented out because app.js reads
+           #acknowledge in four places and would throw on null. While hidden it
+           stays unchecked, so submissions send acknowledge: false. -->
+      <div id="acknowledgeRow" class="checkbox-row hidden">
+        <input id="acknowledge" type="checkbox" name="acknowledge">
+        <label for="acknowledge">Send me a confirmation email.</label>
+      </div>
+    </div>
+
+    <div id="lockupFields" class="hidden">
+      <label for="bulkChanges">Information</label>
+      <p id="bulkHint" class="field-hint"></p>
+      <textarea id="bulkChanges" name="bulkChanges" rows="5"></textarea>
+    </div>
+
+    <p class="access-note">Allow 24 hours for access.</p>
+    <div class="btn-row">
+      <button type="submit" class="submit-btn">Submit Request</button>
+      <button type="button" class="cancel-btn" onclick="confirmCancel()">Cancel</button>
+    </div>
+
+    </div>
+    <div id="message" role="status" aria-live="polite" aria-atomic="true"></div>
+  </form>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
