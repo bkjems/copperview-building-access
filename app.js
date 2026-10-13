@@ -228,7 +228,7 @@ if (testParam) {
     form.accessInfo.value = '10/12/2026 6:00 - 8:00am\nPlay Basketball';
     form.acknowledge.checked = true;
     if (approvedSelect) {
-      approvedSelect.value = 'no';
+      approvedSelect.value = 'yes';
       approvedSelect.dispatchEvent(new Event('change'));
     }
   } else if (testParam === '2') {
