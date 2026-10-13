@@ -228,7 +228,7 @@ if (testParam) {
     form.accessInfo.value = '5/2 8am-10am\n5/9 8am-10am\n5/12 6pm-8pm\nPractice Organ';
     form.acknowledge.checked = true;
     if (approvedSelect) {
-      approvedSelect.value = 'yes';
+      approvedSelect.value = 'no';
       approvedSelect.dispatchEvent(new Event('change'));
     }
   } else if (testParam === '2') {
