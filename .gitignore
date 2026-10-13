@@ -11,9 +11,7 @@ email.md
 login_tracker/__pycache__/
 output/
 apps_script/
-# Real Apps Script source. Holds building manager email addresses, which are
-# deliberately kept out of this public repo — edit here, paste into `notify_me`.
-appscript
-# Copy pulled back down from the deployed `notify_me` project. Same reason.
-notify_me
-code.gs_SAVED
+# Real Apps Script source for the `notify_me` project — the only local copy.
+# Holds building manager email addresses, which are deliberately kept out of
+# this public repo. Edit here, paste over Code.gs in Google, deploy New version.
+Code.gs
