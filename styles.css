@@ -6,6 +6,7 @@
   --heading: #fff;
   --btn-bg: #4285f4;
   --btn-hover: #3367d6;
+  --reminder: #e6a817;
 }
 .light {
   --bg: #fff;
@@ -15,6 +16,7 @@
   --heading: #333;
   --btn-bg: #4285f4;
   --btn-hover: #3367d6;
+  --reminder: #9a6700;
 }
 .hidden { display: none; }
 * { box-sizing: border-box; }
@@ -51,7 +53,7 @@ input[type="time"]::-webkit-date-and-time-value {
   text-align: left;
 }
 .field-hint { font-size: 0.8rem; color: #888; margin: 4px 0 0; }
-.field-reminder { color: #e6a817; }
+.field-reminder { color: var(--reminder); }
 /* A separate question, not a trailing part of Information — hence more space
    above than below. min-height is the tap target (WCAG 2.5.8 wants 24px, iOS
    HIG 44); the negative margin absorbs the extra so the note below keeps its
