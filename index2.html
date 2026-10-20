@@ -8,8 +8,10 @@
 </head>
 <body class="light">
   <div class="header">
-    <h2><span id="stakeName"></span><br><span class="header-subtitle">Temporary Building Access</span></h2>
-    <button type="button" id="modeToggle" onclick="toggleMode()" aria-label="Toggle light and dark mode">&#9789;</button>
+    <div class="header-brand">
+      <h2><span id="stakeName"></span><br><span class="header-subtitle">Temporary Building Access</span></h2>
+    </div>
+    <button type="button" id="modeToggle" onclick="toggleMode()" aria-label="Toggle light and dark mode" data-fixed-icon>&#9680;</button>
   </div>
   <form id="licenseForm">
     <label for="ward">Ward</label>

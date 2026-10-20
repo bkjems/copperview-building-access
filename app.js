@@ -122,6 +122,8 @@ function confirmCancel() {
 function toggleMode() {
   document.body.classList.toggle('light');
   var btn = document.getElementById('modeToggle');
+  // index2.html uses one icon (◐) for both modes, so leave it alone
+  if (btn.hasAttribute('data-fixed-icon')) return;
   btn.innerHTML = document.body.classList.contains('light') ? '&#9789;' : '&#9728;';
 }
 
