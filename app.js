@@ -47,8 +47,8 @@ document.querySelectorAll('textarea').forEach(function(ta) {
   ta.addEventListener('input', function() { autoGrow(this); });
 });
 
-// The scheduler-approval dropdown only exists on index2.html, which in turn
-// drops #schedulerReminder. Hide whichever of these the page has.
+// The scheduler-approval dropdown only exists on index2.html. Hide whichever
+// of these the page has.
 function hideApprovalFields() {
   ['schedulerReminder', 'approvalRow', 'approvalWarning'].forEach(function(id) {
     var el = document.getElementById(id);

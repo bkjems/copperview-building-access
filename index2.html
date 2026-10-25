@@ -30,9 +30,10 @@
       <option value="building_access">Building Access</option>
       <option value="building_lockup">Schedule Building Lockup</option>
     </select>
+    <p id="schedulerReminder" class="field-hint field-reminder hidden">Approval from the building scheduler is required first.</p>
     <!-- Test page for the scheduler-approval dropdown. Same as index.html except
-         this block replaces #schedulerReminder. app.js only touches #approved
-         when it exists, so index.html is unaffected. -->
+         for this block. app.js only touches #approved when it exists, so
+         index.html is unaffected. -->
     <div id="approvalRow" class="hidden">
       <label for="approved">Did you get approval from the building scheduler?</label>
       <select id="approved" name="approved">
