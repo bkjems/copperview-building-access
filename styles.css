@@ -44,6 +44,13 @@ input, select, textarea {
   font-size: 1rem;
   -webkit-appearance: none;
 }
+/* Chrome on iPhone autofills by script and paints the filled field light blue with
+   black text as an inline style, which the :autofill rules below never see. These
+   beat an inline style, so a filled field keeps the theme's colors. */
+input, select, textarea {
+  background-color: var(--input-bg) !important;
+  color: var(--text) !important;
+}
 textarea {
   resize: vertical;
   font-size: 0.8rem;
