@@ -44,13 +44,17 @@ input, select, textarea {
   font-size: 1rem;
   -webkit-appearance: none;
 }
-/* Chrome on iPhone autofills by script and paints the filled field light blue with
-   black text as an inline style, which the :autofill rules below never see. These
-   beat an inline style, so a filled field keeps the theme's colors. */
-input, select, textarea {
-  background-color: var(--input-bg) !important;
-  color: var(--text) !important;
+/* Chrome on iPhone paints an autofilled field light blue with black text, in a way
+   that background-color and color rules can't override. An inset shadow paints over
+   whatever background is underneath, and the text fill color wins over `color`, so
+   draw the theme's colors that way on every field. app.js also strips any colors a
+   browser sets directly on a field (stripInlineFieldColors). */
+input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+  -webkit-box-shadow: 0 0 0 1000px var(--input-bg) inset;
+  box-shadow: 0 0 0 1000px var(--input-bg) inset;
+  -webkit-text-fill-color: var(--text);
 }
+input::placeholder, textarea::placeholder { -webkit-text-fill-color: #888; }
 textarea {
   resize: vertical;
   font-size: 0.8rem;
