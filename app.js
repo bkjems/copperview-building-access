@@ -39,6 +39,22 @@ CONFIG.buildings.forEach(function(b) {
 
 
 // Auto-grow textareas on input
+// Chrome on iPhone autofills by script, and may set the field's colors directly on
+// the element, where they can outrank the stylesheet. Take those colors back off
+// whenever they appear so a filled field keeps the theme's colors. Other inline
+// styles (autoGrow's height) are left alone.
+var FIELD_COLOR_PROPS = ['background', 'background-color', 'background-image', 'color', '-webkit-text-fill-color', 'box-shadow', '-webkit-box-shadow'];
+function stripInlineFieldColors(el) {
+  FIELD_COLOR_PROPS.forEach(function(prop) {
+    if (el.style.getPropertyValue(prop)) el.style.removeProperty(prop);
+  });
+}
+document.querySelectorAll('input, select, textarea').forEach(function(el) {
+  stripInlineFieldColors(el);
+  new MutationObserver(function() { stripInlineFieldColors(el); })
+    .observe(el, { attributes: true, attributeFilter: ['style'] });
+});
+
 function autoGrow(el) {
   el.style.height = 'auto';
   el.style.height = el.scrollHeight + 'px';
