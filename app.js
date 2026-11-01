@@ -63,8 +63,7 @@ document.querySelectorAll('textarea').forEach(function(ta) {
   ta.addEventListener('input', function() { autoGrow(this); });
 });
 
-// The scheduler-approval dropdown only exists on index2.html. Hide whichever
-// of these the page has.
+// Hide whichever of the scheduler-approval fields the page has.
 function hideApprovalFields() {
   ['schedulerReminder', 'approvalRow', 'approvalWarning'].forEach(function(id) {
     var el = document.getElementById(id);
@@ -122,13 +121,41 @@ document.getElementById('request').addEventListener('change', function() {
   bulkHint.textContent = 'Enter 1 or more: Name, Email, Date Range.';
 });
 
+var MESSAGE_CLOSE_SECONDS = 15;
+var messageTimer = null;
+
+// Clears the message, its close button, and any running countdown, so a
+// stale countdown can never wipe out a newer message.
+function clearMessage() {
+  clearInterval(messageTimer);
+  messageTimer = null;
+  document.getElementById('message').textContent = '';
+  document.getElementById('messageClose').classList.add('hidden');
+}
+
+function startMessageCountdown() {
+  var closeBtn = document.getElementById('messageClose');
+  var remaining = MESSAGE_CLOSE_SECONDS;
+  clearInterval(messageTimer);
+  closeBtn.textContent = 'Close (' + remaining + ')';
+  closeBtn.classList.remove('hidden');
+  messageTimer = setInterval(function() {
+    remaining--;
+    if (remaining <= 0) {
+      clearMessage();
+    } else {
+      closeBtn.textContent = 'Close (' + remaining + ')';
+    }
+  }, 1000);
+}
+
 function confirmCancel() {
   var form = document.getElementById('licenseForm');
   var hasInput = form.name.value || form.email.value || form.accessInfo.value ||
     form.acknowledge.checked || (approvedSelect && approvedSelect.value);
   if (!hasInput || confirm('Are you sure you want to clear the form?')) {
     form.reset();
-    document.getElementById('message').textContent = '';
+    clearMessage();
     document.getElementById('requestContent').classList.add('hidden');
     document.getElementById('usageNote').classList.remove('hidden');
     hideApprovalFields();
@@ -138,7 +165,7 @@ function confirmCancel() {
 function toggleMode() {
   document.body.classList.toggle('light');
   var btn = document.getElementById('modeToggle');
-  // index2.html uses one icon (◐) for both modes, so leave it alone
+  // A data-fixed-icon button uses one icon (◐) for both modes, so leave it alone
   if (btn.hasAttribute('data-fixed-icon')) return;
   btn.innerHTML = document.body.classList.contains('light') ? '&#9789;' : '&#9728;';
 }
@@ -189,7 +216,7 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
   submitBtn.disabled = true;
   submitBtn.textContent = 'Submitting...';
 
-  document.getElementById('message').textContent = '';
+  clearMessage();
 
   fetch(APPS_SCRIPT_URL, {
     method: 'POST',
@@ -212,6 +239,11 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
 
     msg.style.color = '#4caf50';
     msg.textContent = (result && result.message) || 'Request submitted successfully!';
+    // Added here rather than in the Apps Script so Uptime Kuma's keyword check
+    // on its response is unaffected. Lockups grant no Kindoo access.
+    if (data.request === 'building_access') {
+      msg.textContent += '\n\nCheck the Kindoo app for access within 48 hours.';
+    }
     msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
     form.reset();
     document.getElementById('requestContent').classList.add('hidden');
@@ -219,7 +251,7 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
     hideApprovalFields();
     submitBtn.disabled = false;
     submitBtn.textContent = 'Submit Request';
-    setTimeout(function() { msg.textContent = ''; }, 9000);
+    startMessageCountdown();
   })
   .catch(function(err) {
     // Network/CORS rejections carry browser-specific text ("Failed to fetch"),

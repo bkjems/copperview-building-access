@@ -4,12 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Copperview Stake - Temporary Building Access</title>
-  <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body class="light">
   <div class="header">
-    <h2><span id="stakeName"></span><br><span class="header-subtitle">Temporary Building Access</span></h2>
-    <button type="button" id="modeToggle" onclick="toggleMode()" aria-label="Toggle light and dark mode">&#9789;</button>
+    <div class="header-brand">
+      <h2><span id="stakeName"></span><br><span class="header-subtitle">Temporary Building Access</span></h2>
+    </div>
+    <button type="button" id="modeToggle" onclick="toggleMode()" aria-label="Toggle light and dark mode" data-fixed-icon>&#9680;</button>
   </div>
   <form id="licenseForm">
     <label for="ward">Ward</label>
@@ -28,7 +30,16 @@
       <option value="building_access">Building Access</option>
       <option value="building_lockup">Schedule Building Lockup</option>
     </select>
-    <p id="schedulerReminder" class="field-hint field-reminder hidden">Requires building scheduler approval.</p>
+    <p id="schedulerReminder" class="field-hint field-reminder hidden">Approval from the building scheduler is required first.</p>
+    <div id="approvalRow" class="hidden">
+      <label for="approved">Did you get approval from the building scheduler?</label>
+      <select id="approved" name="approved">
+        <option value="">-- Select --</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+      <p id="approvalWarning" class="field-hint field-reminder hidden">Your building access will still work, but if someone has the gym or another room reserved with the building scheduler, they have priority and may ask you to leave.</p>
+    </div>
 
     <p id="usageNote" class="access-note">Select your Ward, a Building and choose your Request.</p>
 
@@ -72,9 +83,11 @@
 
     </div>
     <div id="message" role="status" aria-live="polite" aria-atomic="true"></div>
+    <!-- Outside #message so the countdown isn't re-announced every second. -->
+    <button type="button" id="messageClose" class="hidden" onclick="clearMessage()"></button>
   </form>
 
   <script src="config.js"></script>
-  <script src="app.js?v=2"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

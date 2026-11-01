@@ -8,6 +8,7 @@ async function fillValidForm(page) {
   await page.selectOption('#ward', '8th Ward');
   await page.selectOption('#building', 'Stake Center');
   await page.selectOption('#request', 'building_access');
+  await page.selectOption('#approved', 'yes');
   await page.fill('#name', 'John Test');
   await page.fill('#email', 'test@example.com');
   await page.fill('#accessInfo', 'Tomorrow 8am - 10pm\nFamily Party');
@@ -111,7 +112,7 @@ test.describe('Submission', () => {
 
     await page.click('.submit-btn');
 
-    await expect(page.locator('#message')).toHaveText('Request submitted successfully!');
+    await expect(page.locator('#message')).toHaveText('Request submitted successfully! Check the Kindoo app for access within 48 hours.');
 
     expect(capturedBody).toBeTruthy();
     const decoded = decodeURIComponent(capturedBody).replace('data=', '');
@@ -122,6 +123,7 @@ test.describe('Submission', () => {
     expect(data.name).toBe('John Test');
     expect(data.email).toBe('test@example.com');
     expect(data.accessInfo).toBe('Tomorrow 8am - 10pm\nFamily Party');
+    expect(data.approved).toBe('yes');
     expect(data.acknowledge).toBe(false);
   });
 
@@ -141,7 +143,7 @@ test.describe('Submission', () => {
 
     await page.click('.submit-btn');
 
-    await expect(page.locator('#message')).toHaveText('Request submitted successfully!');
+    await expect(page.locator('#message')).toHaveText('Request submitted successfully! Check the Kindoo app for access within 48 hours.');
 
     const data = JSON.parse(decodeURIComponent(capturedBody).replace('data=', ''));
     expect(data.acknowledge).toBe(true);
@@ -180,10 +182,43 @@ test.describe('Submission', () => {
     await fillValidForm(page);
     await page.click('.submit-btn');
 
-    await expect(page.locator('#message')).toHaveText('Request submitted successfully!');
+    await expect(page.locator('#message')).toHaveText('Request submitted successfully! Check the Kindoo app for access within 48 hours.');
 
     await expect(page.locator('#requestContent')).toHaveClass(/hidden/);
     await expect(page.locator('#usageNote')).toHaveClass(/hidden/);
+  });
+
+  test('close button dismisses the success message', async ({ page }) => {
+    await page.route('**/macros/s/**', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: SUCCESS_BODY });
+    });
+
+    await page.goto('/');
+    await fillValidForm(page);
+    await page.click('.submit-btn');
+
+    await expect(page.locator('#messageClose')).toHaveText('Close (15)');
+    await page.click('#messageClose');
+    await expect(page.locator('#message')).toHaveText('');
+    await expect(page.locator('#messageClose')).toBeHidden();
+  });
+
+  test('success message closes itself after the countdown', async ({ page }) => {
+    await page.clock.install();
+    await page.route('**/macros/s/**', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: SUCCESS_BODY });
+    });
+
+    await page.goto('/');
+    await fillValidForm(page);
+    await page.click('.submit-btn');
+
+    await expect(page.locator('#messageClose')).toHaveText('Close (15)');
+    await page.clock.runFor(5000);
+    await expect(page.locator('#messageClose')).toHaveText('Close (10)');
+    await page.clock.runFor(10000);
+    await expect(page.locator('#message')).toHaveText('');
+    await expect(page.locator('#messageClose')).toBeHidden();
   });
 
   test('network error shows error message', async ({ page }) => {

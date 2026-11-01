@@ -18,6 +18,7 @@ test('submit to real endpoint and verify email manually', async ({ page }) => {
   // Without it checkValidity() fails and the form never submits.
   await page.selectOption('#building', 'Stake Center');
   await page.selectOption('#request', 'building_access');
+  await page.selectOption('#approved', 'yes');
   await page.fill('#name', 'Playwright Test');
   await page.fill('#email', process.env.REAL_EMAIL || 'test@example.com');
   await page.fill('#accessInfo', 'Tomorrow 8:00 AM - 10:00 PM\nPlaywright real submission test');
