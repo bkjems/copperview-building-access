@@ -112,7 +112,7 @@ test.describe('Submission', () => {
 
     await page.click('.submit-btn');
 
-    await expect(page.locator('#message')).toHaveText('Request submitted successfully! Check the Kindoo app for access within 48 hours.');
+    await expect(page.locator('#message')).toHaveText('Request submitted successfully! Check the Kindoo app for access within 24 hours.');
 
     expect(capturedBody).toBeTruthy();
     const decoded = decodeURIComponent(capturedBody).replace('data=', '');
@@ -143,7 +143,7 @@ test.describe('Submission', () => {
 
     await page.click('.submit-btn');
 
-    await expect(page.locator('#message')).toHaveText('Request submitted successfully! Check the Kindoo app for access within 48 hours.');
+    await expect(page.locator('#message')).toHaveText('Request submitted successfully! Check the Kindoo app for access within 24 hours.');
 
     const data = JSON.parse(decodeURIComponent(capturedBody).replace('data=', ''));
     expect(data.acknowledge).toBe(true);
@@ -182,7 +182,7 @@ test.describe('Submission', () => {
     await fillValidForm(page);
     await page.click('.submit-btn');
 
-    await expect(page.locator('#message')).toHaveText('Request submitted successfully! Check the Kindoo app for access within 48 hours.');
+    await expect(page.locator('#message')).toHaveText('Request submitted successfully! Check the Kindoo app for access within 24 hours.');
 
     await expect(page.locator('#requestContent')).toHaveClass(/hidden/);
     await expect(page.locator('#usageNote')).toHaveClass(/hidden/);
