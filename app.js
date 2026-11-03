@@ -242,7 +242,7 @@ document.getElementById('licenseForm').addEventListener('submit', function(ev) {
     // Added here rather than in the Apps Script so Uptime Kuma's keyword check
     // on its response is unaffected. Lockups grant no Kindoo access.
     if (data.request === 'building_access') {
-      msg.textContent += '\n\nCheck the Kindoo app for access within 48 hours.';
+      msg.textContent += '\n\nCheck the Kindoo app for access within 24 hours.';
     }
     msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
     form.reset();
